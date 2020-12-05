@@ -67,8 +67,8 @@ public class SongListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @NonNull
     @Override
     public String getSectionName(int position) {
-        return "a";
-        //TODO fix recycler Bubble
+        return songList.get(position).getTitle().substring(0,1);
+        //TODO fix for shuffle ish
     }
 
     private class SongViewHolder extends RecyclerView.ViewHolder{

@@ -26,6 +26,7 @@ public class SongItem {
 
     public SongItem(int songType) {
         this.songType = songType;
+        this.title = "0";
     }
     public SongItem(String title, String artist,String album, long albumId,int duration, String data, int songType) {
         this.albumId = albumId;
