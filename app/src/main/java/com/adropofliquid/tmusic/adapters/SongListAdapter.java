@@ -19,10 +19,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.items.SongItem;
 import com.bumptech.glide.Glide;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
-public class SongListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class SongListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements FastScrollRecyclerView.SectionedAdapter{
     private static int SHUFFLE_ALL = 1;
     private static int SONGS_ITEM = 2;
     private Context context;
@@ -61,6 +62,13 @@ public class SongListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         } else {
             ((SongViewHolder) holder).bindSongsViews(songList.get(position));
         }
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        return "a";
+        //TODO fix recycler Bubble
     }
 
     private class SongViewHolder extends RecyclerView.ViewHolder{
