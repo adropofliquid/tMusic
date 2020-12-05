@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">tMusic</string>
+    <string name="my_library">My Library</string>
+    <string name="permission">Permission</string>
+    <string name="music_needs_permission_">Music needs permission to run this feature</string>
+    <string name="storage">Storage</string>
+    <string name="to_access_audio_">To access audio content on your device</string>
+    <string name="app_info">APP INFO</string>
+    <string name="cancel">CANCEL</string>
+    <string name="three_dots">⋮</string>
+    <string name="shuffle_all">Shuffle all</string>
+    <string name="no_song">No Music</string>
+    <string name="artist">Artist</string>
+</resources>
