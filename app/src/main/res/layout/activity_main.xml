@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
@@ -15,12 +15,11 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-<!--    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/song_list_recycler"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>-->
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:paddingBottom="68dp">
 
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/song_list_recycler"
@@ -31,7 +30,11 @@
         app:fastScrollPopupBgColor="@color/purple_link"
         app:fastScrollPopupTextColor="@android:color/white"
         app:fastScrollThumbColor="@color/purple_link"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+       />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include layout="@layout/bottom_player" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

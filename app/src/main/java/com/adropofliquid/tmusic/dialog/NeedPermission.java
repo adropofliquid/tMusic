@@ -1,4 +1,4 @@
-package com.adropofliquid.tmusic;
+package com.adropofliquid.tmusic.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.adropofliquid.tmusic.R;
+
 
 public class NeedPermission extends DialogFragment{
     public static final String TAG = "Permission Dialog: ";
@@ -28,8 +30,6 @@ public class NeedPermission extends DialogFragment{
 
         LayoutInflater inflater =  requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.need_permission,null);
-
-
 
 
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
