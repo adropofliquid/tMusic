@@ -11,10 +11,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.media.AudioManager;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -24,11 +30,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.adapters.SongListAdapter;
+import com.adropofliquid.tmusic.db.LoadMediaStore;
 import com.adropofliquid.tmusic.dialog.NeedPermission;
+import com.adropofliquid.tmusic.items.SongItem;
 import com.adropofliquid.tmusic.service.PlayerService;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +52,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageView bottomPlayerImage;
     private TextView bottomPlayerTitle;
     private TextView bottomPlayerArtist;
+    private ProgressBar progressBar;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView recyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         bottomPlayerImage = findViewById(R.id.bottom_player_image);
         bottomPlayerTitle = findViewById(R.id.bottom_player_name);
         bottomPlayerArtist = findViewById(R.id.bottom_player_artist);
+        progressBar = findViewById(R.id.progressBar);
 
         ConstraintLayout bottomPlayer = findViewById(R.id.bottom_player);
         bottomPlayer.setOnClickListener(new PlayerOnclickListener());
@@ -84,11 +100,13 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         mediaBrowser.connect();
     }
+
     @Override
     public void onResume() {
         super.onResume();
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
+
     @Override
     public void onStop() {
         super.onStop();
@@ -102,18 +120,30 @@ public class MainActivity extends AppCompatActivity {
     private void populateRecycler() {
         Log.d(TAG, "Recycler View is being populated");
 
-        RecyclerView recyclerView;
-        RecyclerView.Adapter adapter;
         RecyclerView.LayoutManager layoutManager;
-
         recyclerView = findViewById(R.id.song_list_recycler);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new SongListAdapter(this);
-        recyclerView.setAdapter(adapter);
+        new LoadGenre().execute("");
+    }
 
+    private class LoadGenre extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            adapter = new SongListAdapter(MainActivity.this,
+                    new LoadMediaStore(getApplicationContext()).getAllSongs());
+            return "Executed";
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            recyclerView.setAdapter(adapter);
+        }
+        @Override
+        protected void onPreExecute() {
+        }
     }
 
     private final MediaBrowserCompat.ConnectionCallback connectionCallbacks =
@@ -159,18 +189,12 @@ public class MainActivity extends AppCompatActivity {
                     bottomPlayerImage.setImageBitmap(metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ART));
                     bottomPlayerTitle.setText(metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
                     bottomPlayerArtist.setText(metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
+                    progressBar.setMax((int) metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
                 }
 
                 @Override
                 public void onPlaybackStateChanged(PlaybackStateCompat state) {
-//                    final int progress = state != null
-//                            ? (int) state.getPosition()
-//                            : 0;
-//                    final int progress = (int)state.getPosition();
-//                    //seekBar.setProgress(progress);
-//                    if(state.getState() == PlaybackStateCompat.STATE_PLAYING){
-//                        moveSeekBar(progress);
-//                    }
+                    progressBar.setProgress((int) state.getPosition());
                 }
             };
 
@@ -179,9 +203,16 @@ public class MainActivity extends AppCompatActivity {
         mediaController.registerCallback(controllerCallback);
 
         if(mediaController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING){
-            bottomPlayerImage.setImageBitmap(mediaController.getMetadata().getBitmap(MediaMetadataCompat.METADATA_KEY_ART));
-            bottomPlayerTitle.setText(mediaController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_TITLE));
-            bottomPlayerArtist.setText(mediaController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
+            //FIXME it doesn't update when paused.
+            //do better
+
+            MediaMetadataCompat metadata = mediaController.getMetadata();
+
+            bottomPlayerImage.setImageBitmap(metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ART));
+            bottomPlayerTitle.setText(metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
+            bottomPlayerArtist.setText(metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
+
+            progressBar.setMax((int) metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
         }
     }
 
@@ -205,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Permission granted");
             populateRecycler();
         } else {
+            //FIXME pops at the wrong time
             Log.d(TAG, "Permission not granted");
             NeedPermission needPermission = new NeedPermission();
             needPermission.show(getSupportFragmentManager(),"need_permission");
@@ -213,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
 
     //TODO can create a whole class to
     // manage wen player plays or stop or restarts
-    // Class would connect to the controller so it can be detting playback state
+    // Class would connect to the controller so it can be getting playback state
     private class PlayerOnclickListener implements View.OnClickListener{
         @Override
         public void onClick(View view) {

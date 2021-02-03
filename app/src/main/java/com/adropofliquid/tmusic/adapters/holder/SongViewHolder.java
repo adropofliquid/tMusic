@@ -51,26 +51,20 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
         songOptions.setOnClickListener(v -> songOptions.showContextMenu());
     }
 
-    private MediaControllerCompat mediaController(){
-        return MediaControllerCompat.getMediaController(activity);
-    }
-
-    private  MediaControllerCompat.TransportControls controls(){
-        return  mediaController().getTransportControls();
-    }
-
     private void playSongList(ArrayList<SongItem> songList, int adapterPosition) {
 
         Bundle bundle = new Bundle();
-        bundle.putInt(PlayerService.QUEUE_START_KEY, adapterPosition);
+        //bundle.putInt(PlayerService.QUEUE_START_KEY, adapterPosition);
         bundle.putParcelableArrayList(PlayerService.QUEUE_KEY,songList);
 
-        controls().playFromMediaId(String.valueOf(adapterPosition), bundle);
+        MediaControllerCompat.getMediaController(activity).getTransportControls()
+                .playFromMediaId(String.valueOf(adapterPosition), bundle);
 //        Log.d(TAG," "+adapterPosition+". "+songList.get(adapterPosition).getTitle()+ " "+songList.size());
 
     }
 
     public void bindSongsViews(SongItem songItem){
+        //TODO set for when image doesn't exist
         Glide.with(activity.getApplicationContext()).load(songItem.getAlbumArtUri()).centerCrop().into(songArt); //set image
         /*try {
             songArt.setImageBitmap(MediaStore.Images.Media.getBitmap(activity.getContentResolver(),songItem.getAlbumArtUri()));

@@ -7,15 +7,10 @@ import android.os.Parcelable;
 
 public class SongItem implements Parcelable {
     private final String title;
-
-
-
-    private int duration;
     private String artist;
     private long albumId;
     private String album;
     private String data;
-//    private Uri songUri;
 
     private final int songType;
     public static final int TYPE_SONG = 1; // actual song view
@@ -28,20 +23,18 @@ public class SongItem implements Parcelable {
     }
 
     public SongItem(String title, String artist,String album, long albumId,
-                    int duration, String data, int songType) {
+                    String data, int songType) {
         this.albumId = albumId;
         this.artist = artist;
         this.title = title;
         this.songType = songType;
         this.data = data;
         this.album = album;
-        this.duration = duration;
     }
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(title);
-        parcel.writeInt(duration);
         parcel.writeString(artist);
         parcel.writeLong(albumId);
         parcel.writeString(album);
@@ -51,7 +44,6 @@ public class SongItem implements Parcelable {
 
     protected SongItem(Parcel in) {
         title = in.readString();
-        duration = in.readInt();
         artist = in.readString();
         albumId = in.readLong();
         album = in.readString();
@@ -89,9 +81,6 @@ public class SongItem implements Parcelable {
         return uri;
     }
 
-    public int getDuration() {
-        return duration;
-    }
 
     public Uri getSongUri(){
         return Uri.parse("file:///"+data);

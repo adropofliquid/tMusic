@@ -45,7 +45,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
     public static final int Notification_ID = 1;
     public static final String QUEUE_KEY = "queue_key" ;
-    public static final String QUEUE_START_KEY = "queue_start_key" ;
+//    public static final String QUEUE_START_KEY = "queue_start_key" ;
 
     private MediaSessionCompat mediaSession;
     private AudioNoiseReciever noiseReciever;
@@ -341,6 +341,8 @@ public class PlayerService extends MediaBrowserServiceCompat {
             mediaPlayer.pause();
             stopPlaybackStateUpdate();
             noiseReciever.unregisterAudioNoisyReceiver();
+            //FIXME
+            //it's forceclosing after bein in the background for a minute
             stopForeground(false);
 
         }
@@ -377,6 +379,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         @Override
         public void onStop() {
+            stopPlaybackStateUpdate();
             abandonFocus();
             noiseReciever.unregisterAudioNoisyReceiver();
             stopSelf();

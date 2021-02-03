@@ -151,7 +151,9 @@ public class NowPlaying extends AppCompatActivity {
     private void buildTransportControls() {
 
         MediaMetadataCompat metadata = mediaController.getMetadata();
+        PlaybackStateCompat state = mediaController.getPlaybackState();
         seekBar.setMax((int) metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
+        seekBar.setProgress((int) state.getPosition());
 
         viewPager2.setAdapter(new NowPlayingAdapter(this));
         viewPager2.setCurrentItem((int) metadata.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER),false);

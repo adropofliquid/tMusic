@@ -4,24 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_player"
     android:layout_width="match_parent"
-    android:layout_height="65dp"
+    android:layout_height="69dp"
     android:background="@color/white"
     android:orientation="vertical"
     android:elevation="20dp"
     app:behavior_hideable="false"
-    app:behavior_peekHeight="65dp"
+    app:behavior_peekHeight="69dp"
     app:behavior_draggable="false"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+<!--        android:indeterminate="true"-->
+<!--        android:indeterminateTintMode="src_atop"-->
+<!--        android:indeterminateTint="@color/secondary"-->
+<!--        />-->
+
     <ImageView
         android:id="@+id/bottom_player_image"
         android:layout_width="65dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
         app:srcCompat="@drawable/miniplayer_default_album_art" />
 
     <TextView
@@ -75,17 +88,4 @@
         android:background="?attr/selectableItemBackground"
         app:srcCompat="@drawable/ic_baseline_skip_next_24" />
 
-
-<!--    <ImageButton-->
-<!--        android:id="@+id/song_options"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:clickable="true"-->
-<!--        android:focusable="true"-->
-<!--        android:src="@drawable/ic_baseline_more_vert_24"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        android:padding="15dp"/>-->
 </androidx.constraintlayout.widget.ConstraintLayout>
