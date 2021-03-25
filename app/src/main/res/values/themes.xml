@@ -1,16 +1,56 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.TMusic" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.TMusic" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondary">@color/purple_link</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/main_white</item>
+        <item name="android:windowLightStatusBar">true</item>
         <!-- Customize your theme here. -->
     </style>
+    <style name="Theme.TMusic.NowPlaying" parent="Theme.TMusic">
+        <item name="android:statusBarColor" tools:targetApi="l">@color/toolbar_dark_font</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="ToolBarStyle">
+        <item name="android:background">@color/main_white</item>
+        <item name="android:titleTextColor">@color/toolbar_dark_font</item>
+    </style>
+
+    <style name="SongCard" parent="CardView">
+        <item name="android:paddingTop">1dp</item>
+        <item name="android:paddingBottom">1dp</item>
+        <item name="android:background">@color/card_song_bg</item>
+        <item name="android:foreground">?android:selectableItemBackground</item>
+    </style>
+    <style name="SongCardFont" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/font_list_dark</item>
+        <item name="android:maxLines">1</item>
+    </style>
+    <style name="SongCardFontSmall" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/font_list_dark_small</item>
+        <item name="android:maxLines">1</item>
+    </style>
+    <style name="SongCardMoreFade">
+        <item name="android:background">@drawable/more_background</item>
+    </style>
+    <style name="SongCardMore" parent="Widget.AppCompat.ImageButton">
+        <item name="android:src">@drawable/ic_baseline_more_vert_24</item>
+        <item name="android:background">@color/card_song_bg</item>
+        <item name="android:foreground">?attr/selectableItemBackgroundBorderless</item>
+    </style>
+    <style name="ShuffleImg">
+        <item name="android:src">@drawable/music_library_shuffle</item>
+    </style>
+
 </resources>

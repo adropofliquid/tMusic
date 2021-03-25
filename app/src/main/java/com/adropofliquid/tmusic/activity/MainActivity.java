@@ -11,10 +11,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioManager;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -24,11 +31,20 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.adapters.SongListAdapter;
+import com.adropofliquid.tmusic.db.LoadMediaStore;
+import com.adropofliquid.tmusic.db.PlayQueueDb;
+import com.adropofliquid.tmusic.db.QueueDbHelper;
 import com.adropofliquid.tmusic.dialog.NeedPermission;
+import com.adropofliquid.tmusic.items.SongItem;
 import com.adropofliquid.tmusic.service.PlayerService;
+import com.adropofliquid.tmusic.service.Queue;
+import com.bumptech.glide.Glide;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,10 +57,26 @@ public class MainActivity extends AppCompatActivity {
     private ImageView bottomPlayerImage;
     private TextView bottomPlayerTitle;
     private TextView bottomPlayerArtist;
+    private ProgressBar progressBar;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView recyclerView;
+    private ImageButton bottomPlayerPrev;
+    private ImageButton bottomPlayerPlay;
+    private ImageButton bottomPlayerNext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        checkStoragePermission();
+
+        initialize();
+    }
+
+    private void initialize(){
+
+        //        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -56,27 +88,23 @@ public class MainActivity extends AppCompatActivity {
                 connectionCallbacks,
                 null);
 
-        checkStoragePermission();
-
         bottomPlayerImage = findViewById(R.id.bottom_player_image);
         bottomPlayerTitle = findViewById(R.id.bottom_player_name);
         bottomPlayerArtist = findViewById(R.id.bottom_player_artist);
+        progressBar = findViewById(R.id.progressBar);
 
         ConstraintLayout bottomPlayer = findViewById(R.id.bottom_player);
         bottomPlayer.setOnClickListener(new PlayerOnclickListener());
 
 
         //TODO
-        //do sumtin about the buttons wen no media to play
-        //replace dem wit some faint shii or sumtin
-        //only register onclick listener wen dere is sumtin playing
+        // do sumtin about the buttons wen no media to play
+        // replace dem wit some faint shii or sumtin
+        // only register onclick listener wen dere is sumtin playing
 
-        ImageButton bottomPlayerPrev = findViewById(R.id.bottom_player_prev);
-        bottomPlayerPrev.setOnClickListener(new PlayerOnclickListener());
-        ImageButton bottomPlayerPlay = findViewById(R.id.bottom_player_play);
-        bottomPlayerPlay.setOnClickListener(new PlayerOnclickListener());
-        ImageButton bottomPlayerNext = findViewById(R.id.bottom_player_next);
-        bottomPlayerNext.setOnClickListener(new PlayerOnclickListener());
+        bottomPlayerPrev = findViewById(R.id.bottom_player_prev);
+        bottomPlayerPlay = findViewById(R.id.bottom_player_play);
+        bottomPlayerNext = findViewById(R.id.bottom_player_next);
     }
 
     @Override
@@ -84,11 +112,13 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         mediaBrowser.connect();
     }
+
     @Override
     public void onResume() {
         super.onResume();
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
+
     @Override
     public void onStop() {
         super.onStop();
@@ -97,92 +127,15 @@ public class MainActivity extends AppCompatActivity {
             mediaController.unregisterCallback(controllerCallback);
         }
         mediaBrowser.disconnect();
+        //new QueueDbHelper(this).saveQueue(Queue.getQueue(),Queue.getCurrentSongPos(), (int)mediaController.getPlaybackState().getPosition());
     }
 
-    private void populateRecycler() {
-        Log.d(TAG, "Recycler View is being populated");
 
-        RecyclerView recyclerView;
-        RecyclerView.Adapter adapter;
-        RecyclerView.LayoutManager layoutManager;
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //stopService(new Intent(this, PlayerService.class));
 
-        recyclerView = findViewById(R.id.song_list_recycler);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-
-        adapter = new SongListAdapter(this);
-        recyclerView.setAdapter(adapter);
-
-    }
-
-    private final MediaBrowserCompat.ConnectionCallback connectionCallbacks =
-            new MediaBrowserCompat.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-                    // Get the token for the MediaSession
-                    MediaSessionCompat.Token token = mediaBrowser.getSessionToken();
-
-                    mediaController = new MediaControllerCompat(MainActivity.this, // Context
-                            token);
-
-                    // Save the controller
-                    MediaControllerCompat.setMediaController(MainActivity.this, mediaController);
-
-                    // Finish building the UI
-                    buildTransportControls();
-                    Log.v(TAG,"Control Connected");
-//                    Toast.makeText(MainActivity.this, "Control Connected", Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onConnectionSuspended() {
-                    // The Service has crashed. Disable transport controls until it automatically reconnects
-                    Log.v(TAG,"Suspended");
-                }
-
-                @Override
-                public void onConnectionFailed() {
-                    // The Service has refused our connection
-                    Log.v(TAG,"Failed");
-                }
-            };
-
-    private final MediaControllerCompat.Callback controllerCallback =
-            new MediaControllerCompat.Callback() {
-                @Override
-                public void onMetadataChanged(MediaMetadataCompat metadata) {
-                    //do some UI shii to change view if metadata is not empty
-                    Log.d(TAG,"Meta Changed to: "+metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
-
-                    //update mini player
-                    bottomPlayerImage.setImageBitmap(metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ART));
-                    bottomPlayerTitle.setText(metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
-                    bottomPlayerArtist.setText(metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
-                }
-
-                @Override
-                public void onPlaybackStateChanged(PlaybackStateCompat state) {
-//                    final int progress = state != null
-//                            ? (int) state.getPosition()
-//                            : 0;
-//                    final int progress = (int)state.getPosition();
-//                    //seekBar.setProgress(progress);
-//                    if(state.getState() == PlaybackStateCompat.STATE_PLAYING){
-//                        moveSeekBar(progress);
-//                    }
-                }
-            };
-
-    private void buildTransportControls() {
-        // Register a Callback to stay in sync
-        mediaController.registerCallback(controllerCallback);
-
-        if(mediaController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING){
-            bottomPlayerImage.setImageBitmap(mediaController.getMetadata().getBitmap(MediaMetadataCompat.METADATA_KEY_ART));
-            bottomPlayerTitle.setText(mediaController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_TITLE));
-            bottomPlayerArtist.setText(mediaController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
-        }
     }
 
     private void checkStoragePermission() {
@@ -205,15 +158,127 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Permission granted");
             populateRecycler();
         } else {
+            //FIXME pops at the wrong time
             Log.d(TAG, "Permission not granted");
             NeedPermission needPermission = new NeedPermission();
             needPermission.show(getSupportFragmentManager(),"need_permission");
         }
     }
 
-    //TODO can create a whole class to
-    // manage wen player plays or stop or restarts
-    // Class would connect to the controller so it can be detting playback state
+    private void populateRecycler() {
+        Log.d(TAG, "Recycler View is being populated");
+
+        RecyclerView.LayoutManager layoutManager;
+        recyclerView = findViewById(R.id.song_list_recycler);
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+
+        new LoadGenre().execute("");
+
+    }
+
+    private void buildTransportControls() {
+
+        if(!Queue.isEmpty()){
+
+            bottomPlayerPlay.setOnClickListener(new PlayerOnclickListener());
+            bottomPlayerPrev.setOnClickListener(new PlayerOnclickListener());
+            bottomPlayerNext.setOnClickListener(new PlayerOnclickListener());
+
+            Glide.with(this)
+                    .load(Queue.getCurrentSong().getAlbumArtUri())
+                    .centerCrop().into(bottomPlayerImage); //set image
+
+            bottomPlayerTitle.setText(Queue.getCurrentSong().getTitle());
+            bottomPlayerArtist.setText(Queue.getCurrentSong().getArtist());
+
+            changePausePlayButtons();
+
+            progressBar.setProgress(Queue.getSongProgress());
+            progressBar.setMax(Queue.getCurrentSong().getDuration());
+        }
+
+        // Register a Callback to stay in sync
+        mediaController.registerCallback(controllerCallback);
+    }
+
+    private class LoadGenre extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            adapter = new SongListAdapter(MainActivity.this,
+                    new LoadMediaStore(getApplicationContext()).getAllSongs());
+            return "Executed";
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            recyclerView.setAdapter(adapter);
+        }
+        @Override
+        protected void onPreExecute() {
+        }
+    }
+
+    private final MediaBrowserCompat.ConnectionCallback connectionCallbacks =
+            new MediaBrowserCompat.ConnectionCallback() {
+                @Override
+                public void onConnected() {
+                    // Get the token for the MediaSession
+                    MediaSessionCompat.Token token = mediaBrowser.getSessionToken();
+
+                    mediaController = new MediaControllerCompat(MainActivity.this, // Context
+                            token);
+
+                    // Save the controller
+                    MediaControllerCompat.setMediaController(MainActivity.this, mediaController);
+
+                    // Finish building the UI
+                    buildTransportControls();
+                    Log.v(TAG,"Control Connected");
+                }
+
+                @Override
+                public void onConnectionSuspended() {
+                    // The Service has crashed. Disable transport controls until it automatically reconnects
+                    Log.v(TAG,"Suspended");
+                }
+
+                @Override
+                public void onConnectionFailed() {
+                    // The Service has refused our connection
+                    Log.v(TAG,"Failed");
+                }
+            };
+
+    private final MediaControllerCompat.Callback controllerCallback =
+            new MediaControllerCompat.Callback() {
+                @Override
+                public void onMetadataChanged(MediaMetadataCompat metadata) {
+                    Log.d(TAG,"Meta Changed to: "+metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
+
+                    //update mini player
+                    bottomPlayerImage.setImageBitmap(metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ART));
+                    bottomPlayerTitle.setText(metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
+                    bottomPlayerArtist.setText(metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
+                    progressBar.setMax((int) metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
+                }
+
+                @Override
+                public void onPlaybackStateChanged(PlaybackStateCompat state) {
+                    changePausePlayButtons();
+                    progressBar.setProgress((int) state.getPosition());
+                }
+            };
+
+
+    private void changePausePlayButtons(){
+        if((mediaController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING))
+            bottomPlayerPlay.setImageResource(R.drawable.ic_baseline_pause_24);
+        else
+            bottomPlayerPlay.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+    }
+
     private class PlayerOnclickListener implements View.OnClickListener{
         @Override
         public void onClick(View view) {
@@ -227,10 +292,12 @@ public class MainActivity extends AppCompatActivity {
                     mediaController.getTransportControls().skipToPrevious();
                     break;
                 case R.id.bottom_player_play:
-                    if(!(mediaController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING))
+                    if(!(mediaController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING)) {
                         mediaController.getTransportControls().play();
-                    else
+                    }
+                    else {
                         mediaController.getTransportControls().pause();
+                    }
                     break;
                 case R.id.bottom_player_next:
                     mediaController.getTransportControls().skipToNext();

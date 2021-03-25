@@ -11,13 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="380dp"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/miniplayer_default_album_art"
         app:layout_constraintTop_toTopOf="parent" />
 
     <RelativeLayout
         android:id="@+id/relativeview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintTop_toBottomOf="@+id/now_playing_album_art">
 
@@ -26,8 +27,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:textAlignment="center"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:marqueeRepeatLimit="1"
+            android:scrollHorizontally="true"
             android:textColor="@color/white"
-            android:textSize="22sp" />
+            android:textSize="20sp"/>
 
         <TextView
             android:id="@+id/now_playing_artist"
@@ -35,8 +42,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/now_playing_title"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/dark_white"
-            android:textSize="18sp" />
+            android:layout_margin="2dp"
+            android:textColor="@color/now_playing_artist"
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/now_playing_album"
@@ -44,8 +52,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/now_playing_artist"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/dark_white"
-            android:textSize="19sp" />
+            android:textColor="@color/now_playing_album"
+            android:textSize="16sp" />
+
     </RelativeLayout>
 
     <androidx.constraintlayout.widget.Guideline

@@ -1,9 +1,15 @@
 package com.adropofliquid.tmusic.adapters.holder;
 
 import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.media.AudioAttributes;
+import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Handler;
 import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -15,11 +21,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 import com.adropofliquid.tmusic.R;
+import com.adropofliquid.tmusic.activity.NowPlaying;
+import com.adropofliquid.tmusic.db.FeedContract;
+import com.adropofliquid.tmusic.db.PlayQueueDb;
+import com.adropofliquid.tmusic.db.QueueDbHelper;
 import com.adropofliquid.tmusic.items.SongItem;
 import com.adropofliquid.tmusic.service.PlayerService;
+import com.adropofliquid.tmusic.service.Queue;
 import com.bumptech.glide.Glide;
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
@@ -29,9 +38,13 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
     private final TextView songArtist;
     private final ImageButton songOptions;
     private final Activity activity;
+    Handler handler;
 
 
-    public SongViewHolder(Activity activity, @NonNull View itemView, ArrayList<SongItem> songList) { //constructor
+
+    public SongViewHolder(Activity activity,
+                          @NonNull View itemView,
+                          ArrayList<SongItem> songList) { //constructor
         super(itemView);
 
         this.activity = activity;
@@ -40,6 +53,8 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
         songName = itemView.findViewById(R.id.song_name);
         songArtist = itemView.findViewById(R.id.song_artist);
         songOptions = itemView.findViewById(R.id.song_options);
+
+        handler = new Handler();
 
         itemView.setOnClickListener(v -> playSongList(songList,getAdapterPosition() -1));
         itemView.setOnLongClickListener(v -> {
@@ -51,27 +66,62 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
         songOptions.setOnClickListener(v -> songOptions.showContextMenu());
     }
 
-    private MediaControllerCompat mediaController(){
-        return MediaControllerCompat.getMediaController(activity);
+    private void playSongList(ArrayList<SongItem> songList, int adapterPosition) {
+
+        //handler.post(() -> queueDb.setQueue(songList));
+
+       /* new Thread(new Runnable() {
+            @Override
+            public void run()
+            {
+                queueDb.setQueue(songList);
+                //ArrayList<SongItem> songLists = queueDb.getAllSongs();
+            }
+        }).start();*/
+/*
+
+                MediaControllerCompat.getMediaController(activity).getTransportControls()
+                .skipToQueueItem(adapterPosition);
+*/
+
+
+//        Log.d(TAG," "+adapterPosition+". "+songList.get(adapterPosition).getTitle()+ " "+songList.size());
+
+
+        Queue.setQueue(songList);
+        MediaControllerCompat.getMediaController(activity).getTransportControls()
+                .skipToQueueItem(adapterPosition);
     }
 
-    private  MediaControllerCompat.TransportControls controls(){
-        return  mediaController().getTransportControls();
-    }
+/*
 
     private void playSongList(ArrayList<SongItem> songList, int adapterPosition) {
 
         Bundle bundle = new Bundle();
-        bundle.putInt(PlayerService.QUEUE_START_KEY, adapterPosition);
         bundle.putParcelableArrayList(PlayerService.QUEUE_KEY,songList);
 
-        controls().playFromMediaId(String.valueOf(adapterPosition), bundle);
+        */
+/*MediaControllerCompat.getMediaController(activity).getTransportControls()
+                .playFromMediaId(String.valueOf(adapterPosition), bundle);*//*
+
+    MediaControllerCompat.getMediaController(activity).getTransportControls()
+                .skipToQueueItem(adapterPosition);
+
+        Log.d(TAG, "Size: " + bundle.size());
+        MediaControllerCompat.getMediaController(activity).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE);
+        //TODO
+        // save Looping for later use
+        MediaControllerCompat.getMediaController(activity).getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_NONE);
+
 //        Log.d(TAG," "+adapterPosition+". "+songList.get(adapterPosition).getTitle()+ " "+songList.size());
 
     }
+*/
+
 
     public void bindSongsViews(SongItem songItem){
-        Glide.with(activity.getApplicationContext()).load(songItem.getAlbumArtUri()).centerCrop().into(songArt); //set image
+        //TODO set for when image doesn't exist
+        Glide.with(activity).load(songItem.getAlbumArtUri()).centerCrop().into(songArt); //set image
         /*try {
             songArt.setImageBitmap(MediaStore.Images.Media.getBitmap(activity.getContentResolver(),songItem.getAlbumArtUri()));
         } catch (IOException e) {

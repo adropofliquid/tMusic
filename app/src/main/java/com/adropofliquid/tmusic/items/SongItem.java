@@ -4,18 +4,17 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.MediaStore;
 
 public class SongItem implements Parcelable {
+    private int id;
     private final String title;
-
-
-
-    private int duration;
     private String artist;
     private long albumId;
+    private long artistId;
     private String album;
-    private String data;
-//    private Uri songUri;
+    private int duration;
+    private int position;
 
     private final int songType;
     public static final int TYPE_SONG = 1; // actual song view
@@ -27,36 +26,41 @@ public class SongItem implements Parcelable {
         this.title = "0";
     }
 
-    public SongItem(String title, String artist,String album, long albumId,
-                    int duration, String data, int songType) {
+    public SongItem(int id, String title, String artist,String album,
+                    long albumId, int songType, int duration, long artistId, int position) {
+        this.id = id;
         this.albumId = albumId;
         this.artist = artist;
         this.title = title;
         this.songType = songType;
-        this.data = data;
         this.album = album;
         this.duration = duration;
+        this.artistId = artistId;
+        this.position = position;
     }
-
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
         parcel.writeString(title);
-        parcel.writeInt(duration);
         parcel.writeString(artist);
         parcel.writeLong(albumId);
         parcel.writeString(album);
-        parcel.writeString(data);
         parcel.writeInt(songType);
+        parcel.writeInt(duration);
+        parcel.writeLong(artistId);
+        parcel.writeInt(position);
     }
 
     protected SongItem(Parcel in) {
+        id = in.readInt();
         title = in.readString();
-        duration = in.readInt();
         artist = in.readString();
         albumId = in.readLong();
         album = in.readString();
-        data = in.readString();
         songType = in.readInt();
+        duration = in.readInt();
+        artistId = in.readLong();
+        position = in.readInt();
     }
 
     public static final Creator<SongItem> CREATOR = new Creator<SongItem>() {
@@ -71,6 +75,9 @@ public class SongItem implements Parcelable {
         }
     };
 
+    public int getPosition(){
+        return position;
+    }
     public long getSongType() {
         return songType;
     }
@@ -85,29 +92,34 @@ public class SongItem implements Parcelable {
 
     public Uri getAlbumArtUri() {
         Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-        Uri uri = ContentUris.withAppendedId(sArtworkUri, albumId);
-        return uri;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public Uri getSongUri(){
-        return Uri.parse("file:///"+data);
-        //TODO
-        //Sort for playing songs with weird names
-        //Like Car #85
+        return ContentUris.withAppendedId(sArtworkUri, albumId);
     }
 
     public String getAlbum() {
         return album;
     }
 
+    public Uri getUri(){
+        return ContentUris.withAppendedId(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+    }
+    public int getId(){
+        return id;
+    }
+    public int getDuration(){
+        return duration;
+    }
+
+    public long getAlbumId(){
+        return albumId;
+    }
+    public long getArtistId(){
+        return artistId;
+    }
+
     @Override
     public int describeContents() {
         return 0;
     }
-
 
 }

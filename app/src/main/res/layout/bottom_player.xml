@@ -4,30 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_player"
     android:layout_width="match_parent"
-    android:layout_height="65dp"
-    android:background="@color/white"
+    android:layout_height="69dp"
+    style="@style/SongCard"
     android:orientation="vertical"
     android:elevation="20dp"
     app:behavior_hideable="false"
-    app:behavior_peekHeight="65dp"
+    app:behavior_peekHeight="69dp"
     app:behavior_draggable="false"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <ImageView
         android:id="@+id/bottom_player_image"
         android:layout_width="65dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
         app:srcCompat="@drawable/miniplayer_default_album_art" />
 
     <TextView
         android:id="@+id/bottom_player_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/SongCardFont"
         android:layout_marginStart="16dp"
         android:text="@string/no_song"
         app:layout_constraintBottom_toTopOf="@+id/bottom_player_artist"
@@ -39,53 +49,51 @@
         android:id="@+id/bottom_player_artist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/no_song"
-        android:textSize="12sp"
+        style="@style/SongCardFontSmall"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/bottom_player_name"
         app:layout_constraintTop_toBottomOf="@+id/bottom_player_name" />
 
+    <View
+        android:layout_width="5dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="3dp"
+        style="@style/SongCardMoreFade"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/bottom_player_prev"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <ImageButton
         android:id="@+id/bottom_player_prev"
-        android:layout_width="40dp"
+        android:layout_width="50dp"
         android:layout_height="0dp"
+        android:layout_marginTop="3dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/bottom_player_play"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="?attr/selectableItemBackground"
+        style="@style/SongCard"
         app:srcCompat="@drawable/ic_baseline_skip_previous_24" />
 
     <ImageButton
         android:id="@+id/bottom_player_play"
-        android:layout_width="40dp"
+        android:layout_width="50dp"
         android:layout_height="0dp"
+        android:layout_marginTop="3dp"
+        style="@style/SongCard"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/bottom_player_next"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="?attr/selectableItemBackground"
         app:srcCompat="@drawable/ic_baseline_play_arrow_24" />
 
     <ImageButton
         android:id="@+id/bottom_player_next"
-        android:layout_width="40dp"
+        android:layout_width="50dp"
         android:layout_height="0dp"
+        android:layout_marginTop="3dp"
+        style="@style/SongCard"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="?attr/selectableItemBackground"
         app:srcCompat="@drawable/ic_baseline_skip_next_24" />
 
-
-<!--    <ImageButton-->
-<!--        android:id="@+id/song_options"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:background="?attr/selectableItemBackground"-->
-<!--        android:clickable="true"-->
-<!--        android:focusable="true"-->
-<!--        android:src="@drawable/ic_baseline_more_vert_24"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        android:padding="15dp"/>-->
 </androidx.constraintlayout.widget.ConstraintLayout>

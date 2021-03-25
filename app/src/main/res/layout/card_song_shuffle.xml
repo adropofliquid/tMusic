@@ -4,16 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/cardview_light_background"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground">
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginBottom="1dp">
+        style="@style/SongCard">
 
         <ImageView
             android:id="@+id/shuffle_art"
@@ -24,15 +22,15 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/music_library_shuffle" />
+            style="@style/ShuffleImg"/>
 
         <TextView
             android:id="@+id/shuffle_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/SongCardFont"
             android:layout_marginStart="16dp"
             android:text="@string/shuffle_all"
-            android:textColor="@color/font_list_dark"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/shuffle_art"
             app:layout_constraintTop_toTopOf="parent" />

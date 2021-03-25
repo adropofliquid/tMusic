@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.NowPlaying"
-    android:background="@color/font_list_dark">
+    android:background="@color/font_list_dark"
+    android:theme="@style/Theme.TMusic.NowPlaying"
+    tools:context=".activity.NowPlaying">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,31 +28,20 @@
         android:id="@+id/seekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:layout_marginStart="5dp"
-        android:paddingBottom="16dp"
-        android:paddingTop="16dp"
         android:layout_above="@id/play"
-        app:layout_constraintTop_toBottomOf="@+id/guideline"/>
-
-<!--        <com.adropofliquid.tmusic.MediaSeekBar-->
-<!--            android:id="@+id/seekBar"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginEnd="5dp"-->
-<!--            android:layout_marginStart="5dp"-->
-<!--            android:paddingBottom="16dp"-->
-<!--            android:paddingTop="16dp"-->
-<!--            android:layout_above="@id/play"-->
-<!--            app:layout_constraintTop_toTopOf="@+id/guideline"/>-->
+        android:padding="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline" />
 
     <ImageView
         android:id="@+id/play"
-        android:layout_width="70dp"
+        android:layout_width="60dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/notification_play_normal"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/widget_play_normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/next"
         app:layout_constraintStart_toEndOf="@+id/previous"
@@ -58,11 +49,12 @@
 
     <ImageView
         android:id="@+id/previous"
-        android:layout_width="60dp"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@id/play"
         android:src="@drawable/notification_backward_normal"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toBottomOf="@+id/play"
         app:layout_constraintEnd_toStartOf="@+id/play"
         app:layout_constraintStart_toEndOf="@+id/shuffle"
@@ -70,11 +62,12 @@
 
     <ImageView
         android:id="@+id/next"
-        android:layout_width="60dp"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@id/play"
         android:src="@drawable/notification_forward_normal"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toBottomOf="@+id/play"
         app:layout_constraintEnd_toStartOf="@+id/repeat"
         app:layout_constraintStart_toEndOf="@+id/play"
@@ -82,11 +75,13 @@
 
     <ImageView
         android:id="@+id/repeat"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginEnd="30dp"
         android:layout_toLeftOf="@id/previous"
         android:src="@drawable/playerview_repeat_off"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toBottomOf="@+id/next"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/next"
@@ -94,16 +89,44 @@
 
     <ImageView
         android:id="@+id/shuffle"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginStart="30dp"
         android:layout_toRightOf="@id/next"
         android:src="@drawable/playerview_shuffle_off"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toBottomOf="@+id/previous"
         app:layout_constraintEnd_toStartOf="@+id/previous"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/previous" />
 
+    <TextView
+        android:id="@+id/durationStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="15dp"
+        android:paddingTop="10dp"
+        android:text="0:00"
+        android:textColor="@color/dark_white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/shuffle"
+        app:layout_constraintStart_toStartOf="@id/seekBar"
+        app:layout_constraintTop_toBottomOf="@id/seekBar" />
 
+    <TextView
+        android:id="@+id/durationEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingEnd="15dp"
+        android:text="0:00"
+        android:textColor="@color/dark_white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/repeat"
+        app:layout_constraintEnd_toEndOf="@id/seekBar"
+        app:layout_constraintTop_toBottomOf="@id/seekBar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

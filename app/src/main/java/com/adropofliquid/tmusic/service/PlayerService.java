@@ -1,14 +1,25 @@
 package com.adropofliquid.tmusic.service;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.session.PlaybackState;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Process;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
@@ -20,16 +31,23 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.media.MediaBrowserServiceCompat;
 import androidx.media.session.MediaButtonReceiver;
 
 import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.R;
+import com.adropofliquid.tmusic.activity.MainActivity;
 import com.adropofliquid.tmusic.activity.NowPlaying;
+import com.adropofliquid.tmusic.adapters.SongListAdapter;
+import com.adropofliquid.tmusic.db.FeedContract;
+import com.adropofliquid.tmusic.db.LoadMediaStore;
+import com.adropofliquid.tmusic.db.QueueDbHelper;
 import com.adropofliquid.tmusic.items.SongItem;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -45,16 +63,11 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
     public static final int Notification_ID = 1;
     public static final String QUEUE_KEY = "queue_key" ;
-    public static final String QUEUE_START_KEY = "queue_start_key" ;
-
     private MediaSessionCompat mediaSession;
     private AudioNoiseReciever noiseReciever;
 
     private Handler handler;
 
-    private Queue playQueue;
-
-    //TODO maybe create a class
     private MediaPlayer mediaPlayer;
 
     @Override
@@ -84,8 +97,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         handler = new Handler();
 
-        playQueue = new Queue();
-
         Log.d(TAG, "Service Created");
     }
 
@@ -100,6 +111,11 @@ public class PlayerService extends MediaBrowserServiceCompat {
     private void startNotification()  {
         MediaDescriptionCompat description = mediaSession.getController().getMetadata().getDescription();
 
+        //swipe to end service
+        // Make the transport controls visible on the lockscreen
+        //TODo Pause Play buttons
+        // Take advantage of MediaStyle features
+        // Add a cancel button
         Notification notification = new NotificationCompat.Builder(this, App.CHANNEL_ID)
                 .setLargeIcon(description.getIconBitmap())
                 .setContentTitle(description.getTitle())
@@ -119,6 +135,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                         MediaButtonReceiver.buildMediaButtonPendingIntent(this,
                                 PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)))
                 .addAction(new NotificationCompat.Action(
+                        //TODo Pause Play buttons
                         R.drawable.ic_baseline_play_arrow_24, "Play",
                         MediaButtonReceiver.buildMediaButtonPendingIntent(this,
                                 PlaybackStateCompat.ACTION_PLAY_PAUSE)))
@@ -130,10 +147,10 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 // Take advantage of MediaStyle features
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(mediaSession.getSessionToken())
-                        .setShowActionsInCompactView(0,1,2)
+                        .setShowActionsInCompactView(0, 1, 2)
 
                         // Add a cancel button
-                        .setShowCancelButton(false))
+                        .setShowCancelButton(true))
                 .build();
         startForeground(Notification_ID, notification);
     }
@@ -189,6 +206,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         mediaSession.setPlaybackState(stateBuilder.build());
 
+
        /* String stateName = "None";
         switch (newState){
             case PlaybackStateCompat.STATE_PAUSED:
@@ -235,31 +253,39 @@ public class PlayerService extends MediaBrowserServiceCompat {
             setNewState(PlaybackStateCompat.STATE_STOPPED,0);
         }
     }
+    private void stopReleaseMediaPlayer(int state) {
+        if(mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+            mediaPlayer.release();
+            Log.d(TAG," A player was released");
+            mediaPlayer = null;
+            setNewState(state,0);
+        }
+    }
 
     private void startPlayback() {
-        //onPlay,onNext, onPrev called u
 
-        //stop and null the static Player
-        stopReleaseMediaPlayer();
+        //stop and null Player
+        stopReleaseMediaPlayer(PlaybackStateCompat.STATE_PLAYING);
 
         //TODO
         // maybe check if d song exists before creating
         // skip to next if song don't exist
         // on error try to play next song
 
-        mediaPlayer = MediaPlayer.create(this,playQueue.getCurrentSong().getSongUri());
-        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build());
-        //mediaPlayer.setPlaybackParams(new PlaybackParams().setSpeed(4.0f)); //
 
+        mediaPlayer = MediaPlayer.create(this,Queue.getCurrentSong().getUri());
+        //mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build());
+        //mediaPlayer.setPlaybackParams(new PlaybackParams().setSpeed(4.0f)); //
         mediaPlayer.setOnCompletionListener(mediaPlayer -> mediaSession.getController().getTransportControls().skipToNext());
 
         mediaPlayer.start();
         mediaPlayer.seekTo((int) mediaSession.getController().getPlaybackState().getPosition());
-        //setNewState(PlaybackStateCompat.STATE_PLAYING,mediaPlayer.getCurrentPosition());
-        updateCurrentPosition(); // for seekbar and progressbar
-        setNewMetadata(playQueue.getCurrentSong(),mediaPlayer.getDuration(), playQueue.getCurrentSongPos());
+        updateCurrentPosition(); // update state and Position for seekbar and progressbar
+        setNewMetadata(Queue.getCurrentSong(),mediaPlayer.getDuration(), Queue.getCurrentSongPos());
 
-        Log.d(TAG,playQueue.getCurrentSong().getTitle()+" is Playing");
+        Log.d(TAG,Queue.getCurrentSong().getTitle()+" is Playing");
     }
 
     private void updateCurrentPosition() {
@@ -269,6 +295,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
         handler.postDelayed(() -> {
             int currentPosition = mediaPlayer.getCurrentPosition();
             setNewState(PlaybackStateCompat.STATE_PLAYING,currentPosition);
+            Queue.setSongProgress(currentPosition);
             updateCurrentPosition();
         }, 1000);
     }
@@ -287,6 +314,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
     // MediaSession Callback: Transport Controls -> MediaPlayerAdapter
     private class MediaSessionCallback extends MediaSessionCompat.Callback {
+
         @Override
         public void onPlay() {
 
@@ -297,9 +325,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 if (!mediaSession.isActive()) {
                     mediaSession.setActive(true);
                 }
-
                 // start the player
-                //paused and d mediaplayer != null
+                // paused and d mediaplayer != null
+
                 if((mediaSession.getController().getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED)
                         && (mediaPlayer != null)){
                     setNewState(PlaybackStateCompat.STATE_PLAYING,mediaPlayer.getCurrentPosition());
@@ -319,53 +347,55 @@ public class PlayerService extends MediaBrowserServiceCompat {
         }
 
         @Override
-        public void onPlayFromMediaId(String mediaId, Bundle extras) {
-
-            stopReleaseMediaPlayer();
-
-            ArrayList<SongItem> songList = extras.getParcelableArrayList(QUEUE_KEY);
-
-            playQueue.setQueue(songList);
-            playQueue.setCurrentSongPos(Integer.parseInt(mediaId));
-
-            onPlay();
-
-            mediaSession.setExtras(extras);
-        }
-
-        @Override
         public void onPause(){
             Log.d(TAG,"Pause was Called");
             setNewState(PlaybackStateCompat.STATE_PAUSED,mediaPlayer.getCurrentPosition());
-            //setNewMetadata(playQueue.getCurrentSong());
+            //setNewMetadata(Queue.getCurrentSong(),mediaPlayer.getDuration(), Queue.getCurrentSongPos());
             mediaPlayer.pause();
             stopPlaybackStateUpdate();
             noiseReciever.unregisterAudioNoisyReceiver();
-            stopForeground(false);
 
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                stopForeground(Service.STOP_FOREGROUND_DETACH);
+            else
+                stopForeground(false);
         }
 
         @Override
         public void onSkipToNext() {
             Log.d(TAG, " Next Clicked");
-            //not last song
-            if(playQueue.hasNext()){
-                playQueue.setNewPos(playQueue.getCurrentSongPos() + 1);
 
+            int next = Queue.getCurrentSongPos() + 1; //next song on queue
+
+            if(mediaSession.getController().getRepeatMode() == PlaybackStateCompat.REPEAT_MODE_ONE){
+                //play the current song again
+                next = next - 1;
+            }
+
+            if(Queue.hasNext()){
+                Queue.setCurrentSongPos(next);
                 startPlayback();
                 startNotification();//so notification can change wen song changes
             }
             else{
-//                stopReleaseMediaPlayer();
-                onStop();
+                if(mediaSession.getController().getRepeatMode() == PlaybackStateCompat.REPEAT_MODE_ALL){
+                    Queue.setCurrentSongPos(-1);
+                    onSkipToNext();
+                }
+                else{
+                    //stopReleaseMediaPlayer();
+                    onStop();
+                }
+
             }
+
         }
 
         @Override
         public void onSkipToPrevious() {
-            if(playQueue.hasPrev()){// it has previous
+            if(Queue.hasPrev()){// it has previous
                 //TODO logic to restart if playPosition is > 0
-                playQueue.setNewPos(playQueue.getCurrentSongPos() - 1);
+                Queue.setCurrentSongPos(Queue.getCurrentSongPos() - 1);
                 startPlayback();
                 startNotification();
             }
@@ -376,7 +406,21 @@ public class PlayerService extends MediaBrowserServiceCompat {
         }
 
         @Override
+        public void onSkipToQueueItem(long id) {
+
+            //fix for wen it's paused and u start a new queue
+            //set PlayState to Playing
+            setNewState(PlaybackStateCompat.STATE_PLAYING, 0);
+
+            //set queue to all song
+            Queue.setCurrentSongPos((int)id);
+
+            onPlay();
+        }
+
+        @Override
         public void onStop() {
+            stopPlaybackStateUpdate();
             abandonFocus();
             noiseReciever.unregisterAudioNoisyReceiver();
             stopSelf();
@@ -386,9 +430,55 @@ public class PlayerService extends MediaBrowserServiceCompat {
         }
 
         @Override
+        public void onCustomAction(String action, Bundle extras) {
+            if(action.equals("PauseUpdate")){
+                stopPlaybackStateUpdate();
+            }
+            else if(action.equals("PlayUpdate")){
+                updateCurrentPosition();
+            }
+        }
+
+        @Override
         public void onSeekTo(long pos) {
             mediaPlayer.seekTo((int)pos);
         }
+
+        @Override
+        public void onSetShuffleMode(int shuffleMode) {
+            if(shuffleMode == PlaybackStateCompat.SHUFFLE_MODE_ALL){
+                // shuffle came from songs list
+            }
+            else if(shuffleMode == PlaybackStateCompat.SHUFFLE_MODE_GROUP){
+                Queue.setOrderedQueue(new ArrayList<>(Queue.getQueue()));
+
+                ArrayList<SongItem> songListShuffle = new ArrayList<>(Queue.getQueue());
+                SongItem song = Queue.getCurrentSong();
+                songListShuffle.remove(Queue.getCurrentSongPos());
+                Collections.shuffle(songListShuffle);
+                songListShuffle.add(0, song);
+
+                Queue.updateQueue(songListShuffle);
+                Queue.setCurrentBackUpPos(Queue.getCurrentSongPos());
+                Queue.setCurrentSongPos(0);
+
+            }
+            else if (shuffleMode == PlaybackStateCompat.SHUFFLE_MODE_NONE){
+
+                ArrayList<SongItem> songListShuffle = new ArrayList<>(Queue.getOrderedQueue());
+                SongItem song = Queue.getCurrentSong();
+                Queue.setCurrentSongPos(song.getPosition());
+                Queue.updateQueue(songListShuffle);
+            }
+
+            mediaSession.setShuffleMode(shuffleMode);
+        }
+
+        @Override
+        public void onSetRepeatMode(int repeatMode) {
+            mediaSession.setRepeatMode(repeatMode);
+        }
+
 
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -405,7 +495,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
             public void onAudioFocusChange(int focusChange) {
                 switch (focusChange) {
                     case AudioManager.AUDIOFOCUS_GAIN:
-                        //TODO maybe do beta
+                        //TODO
+                        // SOng plays wen call is dropped
+
                         if (mediaSession.getController().getPlaybackState().getState() != PlaybackStateCompat.STATE_PLAYING) {
                             onPlay();
                         } else if (mediaSession.getController().getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING) {
@@ -433,45 +525,5 @@ public class PlayerService extends MediaBrowserServiceCompat {
             am.abandonAudioFocus(afChangeListener);
         }
 
-    }
-
-    private static class Queue {
-
-        private ArrayList<SongItem> queue = null;
-        private int currentSongPos = 0;
-        private final String TAG = "Queue: ";
-
-
-        public void setQueue(ArrayList<SongItem> queue) {
-            this.queue = queue;
-        }
-
-        public ArrayList<SongItem> getQueue() {
-            return queue;
-        }
-
-        public int getCurrentSongPos() {
-            return currentSongPos;
-        }
-
-        public void setCurrentSongPos(int position) {
-            this.currentSongPos = position;
-        }
-
-        public SongItem getCurrentSong() {
-            return queue.get(currentSongPos);
-        }
-
-        public boolean hasNext(){
-            return getCurrentSongPos() + 1 < queue.size();
-        }
-
-        public boolean hasPrev(){
-            return getCurrentSongPos() != 0;
-        }
-
-        public void setNewPos(int position) {
-            this.currentSongPos = position;
-        }
     }
 }

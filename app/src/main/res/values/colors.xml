@@ -10,7 +10,16 @@
     <color name="white">#FFFFFFFF</color>
     <color name="dark_white">#bfbfbf</color>
 
+    <color name="main_white">#fcfcfc</color>
+    <color name="toolbar_dark_font">#212121</color>
     <color name="font_list_dark">#202020</color>
+    <color name="font_list_white">#f2f2f2</color>
     <color name="font_list_dark_small">#737373</color>
+    <color name="font_list_white_small">#bfbfbf</color>
+    <color name="now_playing_artist">#e7e7e7</color>
+    <color name="now_playing_album">#e8e8e8</color>
     <color name="purple_link">#651efe</color>
+    <color name="purple_link_dark">#ac8bf7</color>
+    <color name="card_song_bg">#fafafa</color>
+    <color name="card_song_bg_dark">#282828</color>
 </resources>

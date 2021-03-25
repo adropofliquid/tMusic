@@ -4,6 +4,7 @@
     package="com.adropofliquid.tmusic">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".App"
@@ -13,8 +14,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TMusic">
-        <activity android:name=".activity.NowPlaying"></activity>
-        <activity android:name=".activity.MainActivity">
+        <activity
+            android:theme="@style/Theme.TMusic.NowPlaying"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden"
+            android:name=".activity.NowPlaying" />
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden"
+            android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,7 +31,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.PlayerService">
+        <service android:name=".service.PlayerService" android:stopWithTask="true">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
