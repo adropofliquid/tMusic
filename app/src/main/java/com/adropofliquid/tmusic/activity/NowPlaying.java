@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.ComponentName;
-import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
@@ -25,7 +24,6 @@ import com.adropofliquid.tmusic.adapters.NowPlayingNoAdapter;
 import com.adropofliquid.tmusic.service.PlayerService;
 import com.adropofliquid.tmusic.service.Queue;
 
-import java.util.concurrent.TimeUnit;
 
 
 public class NowPlaying extends AppCompatActivity {
@@ -126,9 +124,6 @@ public class NowPlaying extends AppCompatActivity {
             new MediaControllerCompat.Callback() {
                 @Override
                 public void onMetadataChanged(MediaMetadataCompat metadata) {
-                    //do some UI shii to change view if metadata is not empty
-                    Log.d(TAG,"Meta Changed to: "+metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
-
                     //if it's not already on the song
                     viewPager2.setCurrentItem((int) metadata
                             .getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER));
@@ -171,8 +166,6 @@ public class NowPlaying extends AppCompatActivity {
             playerShuffle.setOnClickListener(new PlayerOnclickListener());
             playerRepeat.setOnClickListener(new PlayerOnclickListener());
 
-            //FIXME might cause issues later
-            // incase modes are not set, but who knows
             changePausePlayButton();
             changeRepeatButtons();
             changeShuffleButton();
@@ -187,21 +180,12 @@ public class NowPlaying extends AppCompatActivity {
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    /*if (fromUser) {
-                        mediaController.getTransportControls().seekTo(progress);
-                        //if(state.getState() == PlaybackStateCompat.STATE_PLAYING){
-                        mediaController.getTransportControls().pause();
-                        mediaController.getTransportControls().play();
-                        //}
-                    }*/
                     durationStart.setText(durationFormat(progress));
-
                 }
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) {
                     String action = "PauseUpdate";
                     mediaController.getTransportControls().sendCustomAction(action, new Bundle());
-
                 }
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
@@ -216,21 +200,6 @@ public class NowPlaying extends AppCompatActivity {
             durationEnd.setText(durationFormat(Queue.getCurrentSong().getDuration()));
 
             viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-                @Override
-                public void onPageSelected(int position) {
-                    /*if(Queue.getCurrentSongPos() == position){
-                        //ignore
-                    }
-                    else {
-                        mediaController.getTransportControls().skipToQueueItem(position);
-                    }*/
-                }
-
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-                }
-
                 @Override
                 public void onPageScrollStateChanged(int state) {
                     if(state == ViewPager2.SCROLL_STATE_IDLE){
@@ -298,23 +267,11 @@ public class NowPlaying extends AppCompatActivity {
                         mediaController.getTransportControls().pause();
                     break;
                 case R.id.next:
-                    //for if repeat one was on
-                    /*if(mediaController.getRepeatMode() == PlaybackStateCompat.REPEAT_MODE_ONE){
-                        mediaController.getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_NONE);
-                        mediaController.getTransportControls().skipToNext();
-                        mediaController.getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_ONE);
-                    }
-                    else{
-                        mediaController.getTransportControls().skipToNext();
-                    }*/
                     viewPager2.setCurrentItem(viewPager2.getCurrentItem()+1);
                     break;
                 case R.id.shuffle:
                     if(mediaController.getShuffleMode() == PlaybackStateCompat.SHUFFLE_MODE_NONE){
                         mediaController.getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_GROUP);
-                        //FIXME
-                        // doesn't update unless restarted
-                        // viewPager2.getAdapter().notifyDataSetChanged();
                         Toast.makeText(NowPlaying.this,"Shuffle On",Toast.LENGTH_SHORT).show();
                     }
                     else{
@@ -341,36 +298,34 @@ public class NowPlaying extends AppCompatActivity {
         }
     }
 
-    private String durationFormat(int duration){
-        //TODO support for hours
-
+  /*  private String durationFormat(int duration){
         return String.format("%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration)),
                 TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)));
+    }*/
+
+    private String durationFormat(int milliSeconds) {
+        String finalTimerString = "";
+        String secondsString;
+
+        //Converting total duration into time
+        int hours =  (milliSeconds / 3600000);
+        int minutes = (milliSeconds % 3600000) / 60000;
+        int seconds = ((milliSeconds % 3600000) % 60000 / 1000);
+
+        // Adding hours if any
+        if (hours > 0)
+            finalTimerString = hours + ":";
+
+        // Prepending 0 to seconds if it is one digit
+        if (seconds < 10)
+            secondsString = "0" + seconds;
+        else
+            secondsString = "" + seconds;
+
+        finalTimerString = finalTimerString + minutes + ":" + secondsString;
+
+        // Return timer String;
+        return finalTimerString;
     }
-//
-//    private String getTimeFormatted(long milliSeconds) {
-//        String finalTimerString = "";
-//        String secondsString;
-//
-//        //Converting total duration into time
-//        int hours = (int) (milliSeconds / 3600000);
-//        int minutes = (int) (milliSeconds % 3600000) / 60000;
-//        int seconds = (int) ((milliSeconds % 3600000) % 60000 / 1000);
-//
-//        // Adding hours if any
-//        if (hours > 0)
-//            finalTimerString = hours + ":";
-//
-//        // Prepending 0 to seconds if it is one digit
-//        if (seconds < 10)
-//            secondsString = "0" + seconds;
-//        else
-//            secondsString = "" + seconds;
-//
-//        finalTimerString = finalTimerString + minutes + ":" + secondsString;
-//
-//        // Return timer String;
-//        return finalTimerString;
-//    }
 }

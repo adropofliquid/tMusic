@@ -103,7 +103,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // stop player and save states
         mediaSession.getController().getTransportControls().stop();
         stopSelf();
     }
@@ -111,12 +110,19 @@ public class PlayerService extends MediaBrowserServiceCompat {
     private void startNotification()  {
         MediaDescriptionCompat description = mediaSession.getController().getMetadata().getDescription();
 
-        //swipe to end service
-        // Make the transport controls visible on the lockscreen
-        //TODo Pause Play buttons
-        // Take advantage of MediaStyle features
-        // Add a cancel button
-        Notification notification = new NotificationCompat.Builder(this, App.CHANNEL_ID)
+        NotificationCompat.Action pause = new NotificationCompat.Action(
+                                R.drawable.ic_baseline_pause_24, "Play",
+                                MediaButtonReceiver.buildMediaButtonPendingIntent(this,
+                                        PlaybackStateCompat.ACTION_PAUSE));
+
+        NotificationCompat.Action play = new NotificationCompat.Action(
+                R.drawable.ic_baseline_play_arrow_24, "Play",
+                MediaButtonReceiver.buildMediaButtonPendingIntent(this,
+                        PlaybackStateCompat.ACTION_PLAY));
+
+
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, App.CHANNEL_ID)
                 .setLargeIcon(description.getIconBitmap())
                 .setContentTitle(description.getTitle())
                 .setContentText(description.getSubtitle())
@@ -134,15 +140,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                         R.drawable.ic_baseline_skip_previous_24, "Previous",
                         MediaButtonReceiver.buildMediaButtonPendingIntent(this,
                                 PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)))
-                .addAction(new NotificationCompat.Action(
-                        //TODo Pause Play buttons
-                        R.drawable.ic_baseline_play_arrow_24, "Play",
-                        MediaButtonReceiver.buildMediaButtonPendingIntent(this,
-                                PlaybackStateCompat.ACTION_PLAY_PAUSE)))
-                .addAction(new NotificationCompat.Action(
-                        R.drawable.ic_baseline_skip_next_24, "Next",
-                        MediaButtonReceiver.buildMediaButtonPendingIntent(this,
-                                PlaybackStateCompat.ACTION_SKIP_TO_NEXT)))
+
 
                 // Take advantage of MediaStyle features
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
@@ -150,9 +148,23 @@ public class PlayerService extends MediaBrowserServiceCompat {
                         .setShowActionsInCompactView(0, 1, 2)
 
                         // Add a cancel button
-                        .setShowCancelButton(true))
-                .build();
-        startForeground(Notification_ID, notification);
+                        .setShowCancelButton(false));
+
+        if(mediaSession.getController().getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED) {
+            builder.addAction(play);
+        }
+        else {
+            builder.addAction(pause);
+        }
+
+        builder.addAction(new NotificationCompat.Action(
+                R.drawable.ic_baseline_skip_next_24, "Next",
+                MediaButtonReceiver.buildMediaButtonPendingIntent(this,
+                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT)));
+
+
+
+        startForeground(Notification_ID, builder.build());
     }
 
     private PendingIntent createContentIntent() {
@@ -193,11 +205,10 @@ public class PlayerService extends MediaBrowserServiceCompat {
     }
 
     private void setNewState(@PlaybackStateCompat.State int newState, long playPosition) {
-        //TODO
-        // setActions should be based on current playstate
-        //switch(get formerState)
+
         PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder().setActions(
-                        PlaybackStateCompat.ACTION_PLAY_PAUSE |
+                        PlaybackStateCompat.ACTION_PLAY |
+                        PlaybackStateCompat.ACTION_PAUSE |
                         PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
                         PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
                         PlaybackStateCompat.ACTION_STOP);
@@ -206,23 +217,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         mediaSession.setPlaybackState(stateBuilder.build());
 
-
-       /* String stateName = "None";
-        switch (newState){
-            case PlaybackStateCompat.STATE_PAUSED:
-                stateName = "Paused";
-                break;
-            case PlaybackStateCompat.STATE_PLAYING:
-                stateName = "Playing";
-                break;
-            case PlaybackStateCompat.STATE_STOPPED:
-                stateName = "Stopped";
-                break;
-            default:
-                break;
-        }*/
-
-        //Log.d(TAG, "PlaybackState is: "+ stateName);
     }
 
     private void setNewMetadata(SongItem songItem,long duration, long positionInQueue) {
@@ -268,12 +262,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         //stop and null Player
         stopReleaseMediaPlayer(PlaybackStateCompat.STATE_PLAYING);
-
-        //TODO
-        // maybe check if d song exists before creating
-        // skip to next if song don't exist
-        // on error try to play next song
-
 
         mediaPlayer = MediaPlayer.create(this,Queue.getCurrentSong().getUri());
         //mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build());
@@ -354,11 +342,13 @@ public class PlayerService extends MediaBrowserServiceCompat {
             mediaPlayer.pause();
             stopPlaybackStateUpdate();
             noiseReciever.unregisterAudioNoisyReceiver();
-
+            startNotification();
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 stopForeground(Service.STOP_FOREGROUND_DETACH);
             else
                 stopForeground(false);
+
+
         }
 
         @Override
@@ -394,7 +384,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
         @Override
         public void onSkipToPrevious() {
             if(Queue.hasPrev()){// it has previous
-                //TODO logic to restart if playPosition is > 0
                 Queue.setCurrentSongPos(Queue.getCurrentSongPos() - 1);
                 startPlayback();
                 startNotification();
@@ -459,7 +448,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 songListShuffle.add(0, song);
 
                 Queue.updateQueue(songListShuffle);
-                Queue.setCurrentBackUpPos(Queue.getCurrentSongPos());
                 Queue.setCurrentSongPos(0);
 
             }
@@ -496,7 +484,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 switch (focusChange) {
                     case AudioManager.AUDIOFOCUS_GAIN:
                         //TODO
-                        // SOng plays wen call is dropped
+                        // Song plays wen call is dropped
 
                         if (mediaSession.getController().getPlaybackState().getState() != PlaybackStateCompat.STATE_PLAYING) {
                             onPlay();

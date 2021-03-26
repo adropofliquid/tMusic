@@ -9,6 +9,7 @@ import com.adropofliquid.tmusic.items.SongItem;
 
 import java.util.ArrayList;
 
+
 public class QueueDbHelper {
 
     private SQLiteDatabase queueDb;
@@ -23,8 +24,6 @@ public class QueueDbHelper {
 
     public void setQueue(ArrayList<SongItem> songList){
 
-        // TODO
-        //  empty database first
         if(!tableIsEmpty())
             emptyQueue();
 
@@ -50,15 +49,10 @@ public class QueueDbHelper {
         queueDb.setTransactionSuccessful();
         queueDb.endTransaction();
 
-        //FIXME fix for multiple taps
-        // maybe add in the background thread
-
     }
 
     public void saveQueue(ArrayList<SongItem> songList, int position, int playPosition){
 
-        // TODO
-        //  empty database first
         if(!tableIsEmpty())
             emptyQueue();
 

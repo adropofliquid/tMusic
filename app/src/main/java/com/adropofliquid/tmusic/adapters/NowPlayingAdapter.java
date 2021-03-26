@@ -39,7 +39,11 @@ public class NowPlayingAdapter extends RecyclerView.Adapter<NowPlayingAdapter.My
         holder.textView.setText(songList.get(position).getTitle());
         holder.textView2.setText(songList.get(position).getArtist());
         holder.textView3.setText(songList.get(position).getAlbum());
-        Glide.with(activity).load(songList.get(position).getAlbumArtUri()).centerCrop().into(holder.imageView); //set image
+        Glide.with(activity)
+                .load(songList.get(position).getAlbumArtUri())
+                .error(R.drawable.musicplayer_library_default_album)
+                .centerCrop()
+                .into(holder.imageView); //set image
     }
 
 

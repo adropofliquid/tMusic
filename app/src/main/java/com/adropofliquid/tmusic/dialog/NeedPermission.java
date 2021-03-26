@@ -2,8 +2,10 @@ package com.adropofliquid.tmusic.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,7 +24,6 @@ public class NeedPermission extends DialogFragment{
 
     public NeedPermission(){}//required empty costructor
 
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -32,14 +33,24 @@ public class NeedPermission extends DialogFragment{
         View view = inflater.inflate(R.layout.need_permission,null);
 
 
+        Intent intent = new Intent();
+
+        intent.setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + view.getContext().getPackageName()));
+
+
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
 
         alertDialog.setView(view);
         alertDialog.setTitle(R.string.permission);
 
+
+
         Dialog disDialog = alertDialog.create();
-        view.findViewById(R.id.app_info).setOnClickListener(view1 -> Log.d(TAG,"Link to Settings for Permission"));
-        view.findViewById(R.id.cancel_permission).setOnClickListener(view12 -> disDialog.dismiss());
+        view.findViewById(R.id.app_info).setOnClickListener(view1 -> {
+            startActivity(intent);
+        });
+        view.findViewById(R.id.cancel_permission).setOnClickListener(view12 -> dismiss());
         return disDialog;
     }
 

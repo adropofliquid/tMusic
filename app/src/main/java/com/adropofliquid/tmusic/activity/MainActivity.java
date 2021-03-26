@@ -91,20 +91,21 @@ public class MainActivity extends AppCompatActivity {
         bottomPlayerImage = findViewById(R.id.bottom_player_image);
         bottomPlayerTitle = findViewById(R.id.bottom_player_name);
         bottomPlayerArtist = findViewById(R.id.bottom_player_artist);
+
+
+
         progressBar = findViewById(R.id.progressBar);
 
         ConstraintLayout bottomPlayer = findViewById(R.id.bottom_player);
         bottomPlayer.setOnClickListener(new PlayerOnclickListener());
 
-
-        //TODO
-        // do sumtin about the buttons wen no media to play
-        // replace dem wit some faint shii or sumtin
-        // only register onclick listener wen dere is sumtin playing
-
         bottomPlayerPrev = findViewById(R.id.bottom_player_prev);
         bottomPlayerPlay = findViewById(R.id.bottom_player_play);
         bottomPlayerNext = findViewById(R.id.bottom_player_next);
+
+        bottomPlayerPlay.setOnClickListener(new PlayerOnclickListener());
+        bottomPlayerPrev.setOnClickListener(new PlayerOnclickListener());
+        bottomPlayerNext.setOnClickListener(new PlayerOnclickListener());
     }
 
     @Override
@@ -127,15 +128,12 @@ public class MainActivity extends AppCompatActivity {
             mediaController.unregisterCallback(controllerCallback);
         }
         mediaBrowser.disconnect();
-        //new QueueDbHelper(this).saveQueue(Queue.getQueue(),Queue.getCurrentSongPos(), (int)mediaController.getPlaybackState().getPosition());
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //stopService(new Intent(this, PlayerService.class));
-
     }
 
     private void checkStoragePermission() {
@@ -181,11 +179,6 @@ public class MainActivity extends AppCompatActivity {
     private void buildTransportControls() {
 
         if(!Queue.isEmpty()){
-
-            bottomPlayerPlay.setOnClickListener(new PlayerOnclickListener());
-            bottomPlayerPrev.setOnClickListener(new PlayerOnclickListener());
-            bottomPlayerNext.setOnClickListener(new PlayerOnclickListener());
-
             Glide.with(this)
                     .load(Queue.getCurrentSong().getAlbumArtUri())
                     .centerCrop().into(bottomPlayerImage); //set image
@@ -255,7 +248,6 @@ public class MainActivity extends AppCompatActivity {
             new MediaControllerCompat.Callback() {
                 @Override
                 public void onMetadataChanged(MediaMetadataCompat metadata) {
-                    Log.d(TAG,"Meta Changed to: "+metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
 
                     //update mini player
                     bottomPlayerImage.setImageBitmap(metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ART));
@@ -282,26 +274,28 @@ public class MainActivity extends AppCompatActivity {
     private class PlayerOnclickListener implements View.OnClickListener{
         @Override
         public void onClick(View view) {
+            if(!Queue.isEmpty())
+            {
+                switch (view.getId()) {
+                    case R.id.bottom_player:
+                        Intent intent = new Intent(getApplicationContext(), NowPlaying.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.bottom_player_prev:
+                        mediaController.getTransportControls().skipToPrevious();
+                        break;
+                    case R.id.bottom_player_play:
+                        if (mediaController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING) {
+                            mediaController.getTransportControls().pause();
 
-            switch (view.getId()){
-                case R.id.bottom_player:
-                    Intent intent = new Intent(getApplicationContext(),NowPlaying.class);
-                    startActivity(intent);
-                    break;
-                case R.id.bottom_player_prev:
-                    mediaController.getTransportControls().skipToPrevious();
-                    break;
-                case R.id.bottom_player_play:
-                    if(!(mediaController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING)) {
-                        mediaController.getTransportControls().play();
-                    }
-                    else {
-                        mediaController.getTransportControls().pause();
-                    }
-                    break;
-                case R.id.bottom_player_next:
-                    mediaController.getTransportControls().skipToNext();
-                    break;
+                        } else {
+                            mediaController.getTransportControls().play();
+                        }
+                        break;
+                    case R.id.bottom_player_next:
+                        mediaController.getTransportControls().skipToNext();
+                        break;
+                }
             }
         }
     }

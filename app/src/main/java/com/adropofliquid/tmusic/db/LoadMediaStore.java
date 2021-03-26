@@ -57,8 +57,6 @@ public class LoadMediaStore {
                 long disAlbumId = songCursor.getLong(albumIdArt);
                 int disDuration = songCursor.getInt(songDuration);
 
-//                Log.d("Add: ",disTitle);
-
                 songList.add(new SongItem(disId, disTitle, disArtist,disAlbum,
                         disAlbumId, SongItem.TYPE_SONG,disDuration, disArtistId, position+1));
                 position = position+1;

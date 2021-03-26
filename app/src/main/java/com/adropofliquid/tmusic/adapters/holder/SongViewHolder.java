@@ -1,16 +1,9 @@
 package com.adropofliquid.tmusic.adapters.holder;
 
 import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.media.AudioAttributes;
-import android.media.MediaPlayer;
-import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -21,18 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.activity.NowPlaying;
-import com.adropofliquid.tmusic.db.FeedContract;
-import com.adropofliquid.tmusic.db.PlayQueueDb;
-import com.adropofliquid.tmusic.db.QueueDbHelper;
 import com.adropofliquid.tmusic.items.SongItem;
-import com.adropofliquid.tmusic.service.PlayerService;
 import com.adropofliquid.tmusic.service.Queue;
 import com.bumptech.glide.Glide;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
-    private static final String TAG = "Song Clicked: ";
     private final ImageView songArt;
     private final TextView songName;
     private final TextView songArtist;
@@ -68,60 +56,19 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
 
     private void playSongList(ArrayList<SongItem> songList, int adapterPosition) {
 
-        //handler.post(() -> queueDb.setQueue(songList));
-
-       /* new Thread(new Runnable() {
-            @Override
-            public void run()
-            {
-                queueDb.setQueue(songList);
-                //ArrayList<SongItem> songLists = queueDb.getAllSongs();
-            }
-        }).start();*/
-/*
-
-                MediaControllerCompat.getMediaController(activity).getTransportControls()
-                .skipToQueueItem(adapterPosition);
-*/
-
-
-//        Log.d(TAG," "+adapterPosition+". "+songList.get(adapterPosition).getTitle()+ " "+songList.size());
-
-
+        if(MediaControllerCompat.getMediaController(activity).getShuffleMode() == PlaybackStateCompat.SHUFFLE_MODE_GROUP){
+            MediaControllerCompat.getMediaController(activity).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE);
+        }
         Queue.setQueue(songList);
         MediaControllerCompat.getMediaController(activity).getTransportControls()
                 .skipToQueueItem(adapterPosition);
     }
 
-/*
-
-    private void playSongList(ArrayList<SongItem> songList, int adapterPosition) {
-
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(PlayerService.QUEUE_KEY,songList);
-
-        */
-/*MediaControllerCompat.getMediaController(activity).getTransportControls()
-                .playFromMediaId(String.valueOf(adapterPosition), bundle);*//*
-
-    MediaControllerCompat.getMediaController(activity).getTransportControls()
-                .skipToQueueItem(adapterPosition);
-
-        Log.d(TAG, "Size: " + bundle.size());
-        MediaControllerCompat.getMediaController(activity).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE);
-        //TODO
-        // save Looping for later use
-        MediaControllerCompat.getMediaController(activity).getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_NONE);
-
-//        Log.d(TAG," "+adapterPosition+". "+songList.get(adapterPosition).getTitle()+ " "+songList.size());
-
-    }
-*/
-
-
     public void bindSongsViews(SongItem songItem){
-        //TODO set for when image doesn't exist
-        Glide.with(activity).load(songItem.getAlbumArtUri()).centerCrop().into(songArt); //set image
+        Glide.with(activity).load(songItem.getAlbumArtUri())
+                .error(R.drawable.miniplayer_default_album_art)
+                .centerCrop()
+                .into(songArt); //set image
         /*try {
             songArt.setImageBitmap(MediaStore.Images.Media.getBitmap(activity.getContentResolver(),songItem.getAlbumArtUri()));
         } catch (IOException e) {
