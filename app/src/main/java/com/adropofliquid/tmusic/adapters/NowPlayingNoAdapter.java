@@ -11,11 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.items.SongItem;
-import com.adropofliquid.tmusic.service.Queue;
 import com.bumptech.glide.Glide;
-
-import java.util.ArrayList;
 
 public class NowPlayingNoAdapter extends RecyclerView.Adapter<NowPlayingNoAdapter.MyViewHolder> {
     private final Activity activity;

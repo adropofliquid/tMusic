@@ -44,8 +44,6 @@ public class NeedPermission extends DialogFragment{
         alertDialog.setView(view);
         alertDialog.setTitle(R.string.permission);
 
-
-
         Dialog disDialog = alertDialog.create();
         view.findViewById(R.id.app_info).setOnClickListener(view1 -> {
             startActivity(intent);

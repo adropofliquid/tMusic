@@ -1,13 +1,6 @@
 package com.adropofliquid.tmusic.adapters;
 
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -15,15 +8,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.activity.MainActivity;
 import com.adropofliquid.tmusic.adapters.holder.ShuffleViewHolder;
 import com.adropofliquid.tmusic.adapters.holder.SongViewHolder;
-import com.adropofliquid.tmusic.db.QueueDbHelper;
 import com.adropofliquid.tmusic.items.SongItem;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
-import java.util.concurrent.Executor;
 
 public class SongListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements FastScrollRecyclerView.SectionedAdapter{
     private static int SHUFFLE_ALL = 1;

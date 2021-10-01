@@ -6,20 +6,38 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 
-public class SongItem implements Parcelable {
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity
+public class SongItem{
+
+    @PrimaryKey
     private int id;
-    private final String title;
+
+    @ColumnInfo(name = "title")
+    private String title;
+
+    @ColumnInfo(name = "artist")
     private String artist;
-    private long albumId;
-    private long artistId;
+
+    @ColumnInfo(name = "album")
     private String album;
+
+    @ColumnInfo(name = "duration")
     private int duration;
+
+    @ColumnInfo(name = "position")
     private int position;
 
-    private final int songType;
+    private long albumId;
+    private long artistId;
+    private int songType;
     public static final int TYPE_SONG = 1; // actual song view
     public static final int TYPE_SHUFFLE = 2; //  shuffle view
 
+    public SongItem(){}
 
     public SongItem(int songType) {
         this.songType = songType;
@@ -38,48 +56,9 @@ public class SongItem implements Parcelable {
         this.artistId = artistId;
         this.position = position;
     }
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(id);
-        parcel.writeString(title);
-        parcel.writeString(artist);
-        parcel.writeLong(albumId);
-        parcel.writeString(album);
-        parcel.writeInt(songType);
-        parcel.writeInt(duration);
-        parcel.writeLong(artistId);
-        parcel.writeInt(position);
-    }
-
-    protected SongItem(Parcel in) {
-        id = in.readInt();
-        title = in.readString();
-        artist = in.readString();
-        albumId = in.readLong();
-        album = in.readString();
-        songType = in.readInt();
-        duration = in.readInt();
-        artistId = in.readLong();
-        position = in.readInt();
-    }
-
-    public static final Creator<SongItem> CREATOR = new Creator<SongItem>() {
-        @Override
-        public SongItem createFromParcel(Parcel in) {
-            return new SongItem(in);
-        }
-
-        @Override
-        public SongItem[] newArray(int size) {
-            return new SongItem[size];
-        }
-    };
 
     public int getPosition(){
         return position;
-    }
-    public long getSongType() {
-        return songType;
     }
 
     public String getTitle() {
@@ -103,9 +82,11 @@ public class SongItem implements Parcelable {
         return ContentUris.withAppendedId(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
     }
+
     public int getId(){
         return id;
     }
+
     public int getDuration(){
         return duration;
     }
@@ -113,13 +94,57 @@ public class SongItem implements Parcelable {
     public long getAlbumId(){
         return albumId;
     }
+
     public long getArtistId(){
         return artistId;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
+    public void setAlbum(String album) {
+        this.album = album;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public void setAlbumId(long albumId) {
+        this.albumId = albumId;
+    }
+
+    public void setArtistId(long artistId) {
+        this.artistId = artistId;
+    }
+
+    public void setSongType(int songType) {
+        this.songType = songType;
+    }
+
+    public int getSongType(){
+        return songType;
+    }
+
+    public static int getTypeSong() {
+        return TYPE_SONG;
+    }
+
+    public static int getTypeShuffle() {
+        return TYPE_SHUFFLE;
     }
 
 }

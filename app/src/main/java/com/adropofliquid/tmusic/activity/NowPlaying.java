@@ -21,9 +21,9 @@ import android.widget.Toast;
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.adapters.NowPlayingAdapter;
 import com.adropofliquid.tmusic.adapters.NowPlayingNoAdapter;
-import com.adropofliquid.tmusic.service.PlayerService;
-import com.adropofliquid.tmusic.service.Queue;
-
+import com.adropofliquid.tmusic.dialog.SleepTimerDialog;
+import com.adropofliquid.tmusic.player.OldPlayList;
+import com.adropofliquid.tmusic.player.PlayerService;
 
 
 public class NowPlaying extends AppCompatActivity {
@@ -31,9 +31,8 @@ public class NowPlaying extends AppCompatActivity {
     private static final String TAG = "NowPlaying: ";
     private ViewPager2 viewPager2;
     private SeekBar seekBar;
-    private TextView durationStart;
-    private TextView durationEnd;
-    private ImageView playerPrev, playerPlay, playerNext, playerShuffle, playerRepeat;
+    private TextView durationStart,durationEnd;
+    private ImageView playerPrev, playerPlay, playerNext, playerShuffle, playerRepeat, sleepTimer;
 
     private MediaBrowserCompat mediaBrowser;
     private MediaControllerCompat mediaController = null;
@@ -57,6 +56,9 @@ public class NowPlaying extends AppCompatActivity {
         durationStart = findViewById(R.id.durationStart);
         durationEnd = findViewById(R.id.durationEnd);
         seekBar = findViewById(R.id.seekBar);
+        sleepTimer = findViewById(R.id.sleepTimer);
+
+
 
     }
 
@@ -153,13 +155,16 @@ public class NowPlaying extends AppCompatActivity {
                 public void onShuffleModeChanged(int shuffleMode) {
                     changeShuffleButton();
                     viewPager2.getAdapter().notifyDataSetChanged();
-                    viewPager2.setCurrentItem(Queue.getCurrentSongPos(),false);
+                    viewPager2.setCurrentItem(OldPlayList.getCurrentSongPos(),false);
                 }
             };
 
     private void buildTransportControls() {
 
-        if(!Queue.isEmpty()){
+        if(!OldPlayList.isEmpty()){
+
+            sleepTimer.setOnClickListener(v -> new SleepTimerDialog(mediaController).show(getSupportFragmentManager(),"sleep_off" ));
+
             playerPrev.setOnClickListener(new PlayerOnclickListener());
             playerPlay.setOnClickListener(new PlayerOnclickListener());
             playerNext.setOnClickListener(new PlayerOnclickListener());
@@ -171,11 +176,11 @@ public class NowPlaying extends AppCompatActivity {
             changeShuffleButton();
 
             viewPager2.setAdapter(new NowPlayingAdapter(this));
-            viewPager2.setCurrentItem(Queue.getCurrentSongPos(), false);
+            viewPager2.setCurrentItem(OldPlayList.getCurrentSongPos(), false);
 
-            seekBar.setMax(Queue.getCurrentSong().getDuration());
+            seekBar.setMax(OldPlayList.getCurrentSong().getDuration());
 
-            seekBar.setProgress(Queue.getSongProgress());
+            seekBar.setProgress(OldPlayList.getSongProgress());
 
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
@@ -189,21 +194,21 @@ public class NowPlaying extends AppCompatActivity {
                 }
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
-                    String action = "PlayUpdate";
+                    String action = "PlayUpdate";//TODO change to constannt PLAYER.ON_PLAY_UPDATE
                     int position = seekBar.getProgress();
                     mediaController.getTransportControls().seekTo(position);
                     mediaController.getTransportControls().sendCustomAction(action, new Bundle());
                 }
             });
 
-            durationStart.setText(durationFormat(Queue.getSongProgress()));
-            durationEnd.setText(durationFormat(Queue.getCurrentSong().getDuration()));
+            durationStart.setText(durationFormat(OldPlayList.getSongProgress()));
+            durationEnd.setText(durationFormat(OldPlayList.getCurrentSong().getDuration()));
 
             viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
                 @Override
                 public void onPageScrollStateChanged(int state) {
                     if(state == ViewPager2.SCROLL_STATE_IDLE){
-                        if(Queue.getCurrentSongPos() != viewPager2.getCurrentItem()){
+                        if(OldPlayList.getCurrentSongPos() != viewPager2.getCurrentItem()){
                             mediaController.getTransportControls().skipToQueueItem(viewPager2.getCurrentItem());
                         }
 

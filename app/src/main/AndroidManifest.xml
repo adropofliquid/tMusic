@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.PlayerService" android:stopWithTask="true">
+        <service android:name=".player.PlayerService" android:stopWithTask="true">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>

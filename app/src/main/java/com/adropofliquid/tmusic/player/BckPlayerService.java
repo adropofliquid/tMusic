@@ -1,25 +1,14 @@
-package com.adropofliquid.tmusic.service;
+package com.adropofliquid.tmusic.player;
 
-import android.Manifest;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.session.PlaybackState;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
-import android.os.Process;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
@@ -31,18 +20,12 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.media.MediaBrowserServiceCompat;
 import androidx.media.session.MediaButtonReceiver;
 
 import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.activity.MainActivity;
 import com.adropofliquid.tmusic.activity.NowPlaying;
-import com.adropofliquid.tmusic.adapters.SongListAdapter;
-import com.adropofliquid.tmusic.db.FeedContract;
-import com.adropofliquid.tmusic.db.LoadMediaStore;
-import com.adropofliquid.tmusic.db.QueueDbHelper;
 import com.adropofliquid.tmusic.items.SongItem;
 
 import java.io.IOException;
@@ -52,7 +35,7 @@ import java.util.List;
 
 
 ////BASED ON https://developer.android.com/guide/topics/media-apps/audio-app/building-a-mediabrowserservice
-public class PlayerService extends MediaBrowserServiceCompat {
+public class BckPlayerService extends MediaBrowserServiceCompat {
     private static final String TAG = "Player Service: ";
     private static final String MY_MEDIA_ROOT_ID = "media_root_id";
     private static final String MY_EMPTY_MEDIA_ROOT_ID = "empty_root_id";
@@ -247,6 +230,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             setNewState(PlaybackStateCompat.STATE_STOPPED,0);
         }
     }
+
     private void stopReleaseMediaPlayer(int state) {
         if(mediaPlayer != null) {
             mediaPlayer.stop();
@@ -263,7 +247,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
         //stop and null Player
         stopReleaseMediaPlayer(PlaybackStateCompat.STATE_PLAYING);
 
-        mediaPlayer = MediaPlayer.create(this,Queue.getCurrentSong().getUri());
+        mediaPlayer = MediaPlayer.create(this, OldPlayList.getCurrentSong().getUri());
         //mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build());
         //mediaPlayer.setPlaybackParams(new PlaybackParams().setSpeed(4.0f)); //
         mediaPlayer.setOnCompletionListener(mediaPlayer -> mediaSession.getController().getTransportControls().skipToNext());
@@ -271,9 +255,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
         mediaPlayer.start();
         mediaPlayer.seekTo((int) mediaSession.getController().getPlaybackState().getPosition());
         updateCurrentPosition(); // update state and Position for seekbar and progressbar
-        setNewMetadata(Queue.getCurrentSong(),mediaPlayer.getDuration(), Queue.getCurrentSongPos());
+        setNewMetadata(OldPlayList.getCurrentSong(),mediaPlayer.getDuration(), OldPlayList.getCurrentSongPos());
 
-        Log.d(TAG,Queue.getCurrentSong().getTitle()+" is Playing");
+        Log.d(TAG, OldPlayList.getCurrentSong().getTitle()+" is Playing");
     }
 
     private void updateCurrentPosition() {
@@ -283,7 +267,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
         handler.postDelayed(() -> {
             int currentPosition = mediaPlayer.getCurrentPosition();
             setNewState(PlaybackStateCompat.STATE_PLAYING,currentPosition);
-            Queue.setSongProgress(currentPosition);
+            OldPlayList.setSongProgress(currentPosition);
             updateCurrentPosition();
         }, 1000);
     }
@@ -308,7 +292,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
             if (requestAudioFocus()) {
                 // Start the service
-                startService(new Intent(PlayerService.this, PlayerService.class));
+                startService(new Intent(BckPlayerService.this, BckPlayerService.class));
 
                 if (!mediaSession.isActive()) {
                     mediaSession.setActive(true);
@@ -355,21 +339,21 @@ public class PlayerService extends MediaBrowserServiceCompat {
         public void onSkipToNext() {
             Log.d(TAG, " Next Clicked");
 
-            int next = Queue.getCurrentSongPos() + 1; //next song on queue
+            int next = OldPlayList.getCurrentSongPos() + 1; //next song on queue
 
             if(mediaSession.getController().getRepeatMode() == PlaybackStateCompat.REPEAT_MODE_ONE){
                 //play the current song again
                 next = next - 1;
             }
 
-            if(Queue.hasNext()){
-                Queue.setCurrentSongPos(next);
+            if(OldPlayList.hasNext()){
+                OldPlayList.setCurrentSongPos(next);
                 startPlayback();
                 startNotification();//so notification can change wen song changes
             }
             else{
                 if(mediaSession.getController().getRepeatMode() == PlaybackStateCompat.REPEAT_MODE_ALL){
-                    Queue.setCurrentSongPos(-1);
+                    OldPlayList.setCurrentSongPos(-1);
                     onSkipToNext();
                 }
                 else{
@@ -383,8 +367,8 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         @Override
         public void onSkipToPrevious() {
-            if(Queue.hasPrev()){// it has previous
-                Queue.setCurrentSongPos(Queue.getCurrentSongPos() - 1);
+            if(OldPlayList.hasPrev()){// it has previous
+                OldPlayList.setCurrentSongPos(OldPlayList.getCurrentSongPos() - 1);
                 startPlayback();
                 startNotification();
             }
@@ -402,7 +386,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             setNewState(PlaybackStateCompat.STATE_PLAYING, 0);
 
             //set queue to all song
-            Queue.setCurrentSongPos((int)id);
+            OldPlayList.setCurrentSongPos((int)id);
 
             onPlay();
         }
@@ -439,24 +423,24 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 // shuffle came from songs list
             }
             else if(shuffleMode == PlaybackStateCompat.SHUFFLE_MODE_GROUP){
-                Queue.setOrderedQueue(new ArrayList<>(Queue.getQueue()));
+                OldPlayList.setOrderedQueue(new ArrayList<>(OldPlayList.getQueue()));
 
-                ArrayList<SongItem> songListShuffle = new ArrayList<>(Queue.getQueue());
-                SongItem song = Queue.getCurrentSong();
-                songListShuffle.remove(Queue.getCurrentSongPos());
+                ArrayList<SongItem> songListShuffle = new ArrayList<>(OldPlayList.getQueue());
+                SongItem song = OldPlayList.getCurrentSong();
+                songListShuffle.remove(OldPlayList.getCurrentSongPos());
                 Collections.shuffle(songListShuffle);
                 songListShuffle.add(0, song);
 
-                Queue.updateQueue(songListShuffle);
-                Queue.setCurrentSongPos(0);
+                OldPlayList.updateQueue(songListShuffle);
+                OldPlayList.setCurrentSongPos(0);
 
             }
             else if (shuffleMode == PlaybackStateCompat.SHUFFLE_MODE_NONE){
 
-                ArrayList<SongItem> songListShuffle = new ArrayList<>(Queue.getOrderedQueue());
-                SongItem song = Queue.getCurrentSong();
-                Queue.setCurrentSongPos(song.getPosition());
-                Queue.updateQueue(songListShuffle);
+                ArrayList<SongItem> songListShuffle = new ArrayList<>(OldPlayList.getOrderedQueue());
+                SongItem song = OldPlayList.getCurrentSong();
+                OldPlayList.setCurrentSongPos(song.getPosition());
+                OldPlayList.updateQueue(songListShuffle);
             }
 
             mediaSession.setShuffleMode(shuffleMode);

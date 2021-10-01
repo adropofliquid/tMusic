@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,28 +13,24 @@
         android:layout_height="wrap_content">
         <include layout="@layout/toolbar_main" />
 
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/library_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabIndicatorHeight="3dp"
+            style="@style/ToolBarStyle"/>
+        <!--app:tabMode="scrollable"-->
+
+
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:paddingBottom="68dp">
+        android:paddingBottom="68dp"/>
 
-    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
-        android:id="@+id/song_list_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:fastScrollThumbEnabled="true"
-        app:fastScrollPopupBgColor="@color/purple_link"
-        app:fastScrollPopupTextColor="@android:color/white"
-        app:fastScrollThumbColor="@color/purple_link"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-       />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include layout="@layout/bottom_player" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

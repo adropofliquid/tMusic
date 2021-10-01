@@ -5,15 +5,29 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
+import androidx.room.Room;
+
+import com.adropofliquid.tmusic.db.room.QueueDb;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class App extends Application {
 
     public static final String CHANNEL_ID = "Music";
+    QueueDb queueDb;
+    ExecutorService executorService;
 
     @Override
     public void onCreate() {
         super.onCreate();
         createChannel();
+        queueDb = Room.databaseBuilder(this, QueueDb.class, "queue").allowMainThreadQueries().build();
+        executorService = Executors.newFixedThreadPool(4);
+
     }
+
     private void createChannel() {
 
         // Create the NotificationChannel, but only on API 26+ because
@@ -30,6 +44,14 @@ public class App extends Application {
             notificationManager.createNotificationChannel(channel);
         }
 
+    }
+
+    public QueueDb getQueueDb() {
+        return queueDb;
+    }
+
+    public Executor getExecutor(){
+        return executorService;
     }
 
 

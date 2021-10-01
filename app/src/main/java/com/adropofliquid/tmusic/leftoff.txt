@@ -1,0 +1,15 @@
+Using Room to save Queue Database
+Only created
+nuthin's bin ddone
+
+Queue class has backgroud tins
+onclick recycler, give it list to be added to db
+tell PlayerService the position //lotta shii to be done. like prepare song or some shii
+and it get's d single file
+
+
+make sleep timer->
+Put in player service\ call using sendCustomControls
+show countdown somewhere / Or not
+https://github.com/android/architecture-components-samples/blob/master/PersistenceContentProviderSample/app/src/main/java/com/example/android/contentprovidersample/data/SampleDatabase.java
+for Room

@@ -1,4 +1,4 @@
-package com.adropofliquid.tmusic.service;
+package com.adropofliquid.tmusic.player;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

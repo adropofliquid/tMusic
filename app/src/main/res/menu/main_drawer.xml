@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <group android:id="@+id/main_group"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/draw_home"
+            android:icon="@drawable/drawer_home"
+            android:title="@string/home"
+            />
+
+        <item
+            android:id="@+id/draw_play_queue"
+            android:icon="@drawable/drawer_artist"
+            android:title="@string/play_queue" />
+
+        <item
+            android:id="@+id/draw_playlist"
+            android:icon="@drawable/drawer_playlists"
+            android:title="@string/playlist" />
+
+        <item
+            android:id="@+id/draw_artist"
+            android:icon="@drawable/drawer_artist"
+            android:title="@string/artist" />
+
+        <item
+            android:id="@+id/draw_albums"
+            android:icon="@drawable/drawer_album"
+            android:title="@string/albums" />
+
+        <item
+            android:id="@+id/draw_songs"
+            android:icon="@drawable/drawer_track"
+            android:title="@string/songs" />
+
+        <item
+            android:id="@+id/draw_genres"
+            android:icon="@drawable/drawer_genre"
+            android:title="@string/genres" />
+
+        <item
+            android:id="@+id/draw_folders"
+            android:icon="@drawable/drawer_folders"
+            android:title="@string/folders" />
+    </group>
+    <group
+        android:checkableBehavior="single"
+        android:id="@+id/next_group">
+        <item
+            android:id="@+id/draw_settings"
+            android:icon="@drawable/drawer_settings"
+            android:title="@string/settings" />
+
+        <item
+            android:id="@+id/draw_help"
+            android:icon="@drawable/drawer_help"
+            android:title="@string/help" />
+
+    </group>
+</menu>

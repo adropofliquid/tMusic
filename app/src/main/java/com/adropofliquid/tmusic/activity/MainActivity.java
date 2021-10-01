@@ -9,19 +9,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -33,18 +26,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.adropofliquid.tmusic.fragment.MyLibraryFragment;
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.adapters.SongListAdapter;
 import com.adropofliquid.tmusic.db.LoadMediaStore;
-import com.adropofliquid.tmusic.db.PlayQueueDb;
-import com.adropofliquid.tmusic.db.QueueDbHelper;
 import com.adropofliquid.tmusic.dialog.NeedPermission;
-import com.adropofliquid.tmusic.items.SongItem;
-import com.adropofliquid.tmusic.service.PlayerService;
-import com.adropofliquid.tmusic.service.Queue;
+import com.adropofliquid.tmusic.player.OldPlayList;
+import com.adropofliquid.tmusic.player.PlayerService;
 import com.bumptech.glide.Glide;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,14 +54,25 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton bottomPlayerPlay;
     private ImageButton bottomPlayerNext;
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .setReorderingAllowed(true)
+                    .add(R.id.fragment_container_view, MyLibraryFragment.class, null)
+                    .commit();
+        }
+
         checkStoragePermission();
 
         initialize();
+
     }
 
     private void initialize(){
@@ -137,9 +138,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkStoragePermission() {
+        //TODO Put permission check/request in DB class
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG,"Permission granted");
-            populateRecycler();
+            //populateRecycler();
+            //do nuthin
         }
         else {
             if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
@@ -154,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, int[] grantResults) {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Permission granted");
-            populateRecycler();
+            //populateRecycler();
         } else {
             //FIXME pops at the wrong time
             Log.d(TAG, "Permission not granted");
@@ -174,22 +177,25 @@ public class MainActivity extends AppCompatActivity {
 
         new LoadGenre().execute("");
 
+
     }
 
     private void buildTransportControls() {
 
-        if(!Queue.isEmpty()){
+///        Queue.loadFromDb(this);
+
+        if(!OldPlayList.isEmpty()){
             Glide.with(this)
-                    .load(Queue.getCurrentSong().getAlbumArtUri())
+                    .load(OldPlayList.getCurrentSong().getAlbumArtUri())
                     .centerCrop().into(bottomPlayerImage); //set image
 
-            bottomPlayerTitle.setText(Queue.getCurrentSong().getTitle());
-            bottomPlayerArtist.setText(Queue.getCurrentSong().getArtist());
+            bottomPlayerTitle.setText(OldPlayList.getCurrentSong().getTitle());
+            bottomPlayerArtist.setText(OldPlayList.getCurrentSong().getArtist());
 
             changePausePlayButtons();
 
-            progressBar.setProgress(Queue.getSongProgress());
-            progressBar.setMax(Queue.getCurrentSong().getDuration());
+            progressBar.setProgress(OldPlayList.getSongProgress());
+            progressBar.setMax(OldPlayList.getCurrentSong().getDuration());
         }
 
         // Register a Callback to stay in sync
@@ -263,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             };
 
-
     private void changePausePlayButtons(){
         if((mediaController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING))
             bottomPlayerPlay.setImageResource(R.drawable.ic_baseline_pause_24);
@@ -274,8 +279,8 @@ public class MainActivity extends AppCompatActivity {
     private class PlayerOnclickListener implements View.OnClickListener{
         @Override
         public void onClick(View view) {
-            if(!Queue.isEmpty())
-            {
+            //if(!OldPlayList.isEmpty())
+            //{
                 switch (view.getId()) {
                     case R.id.bottom_player:
                         Intent intent = new Intent(getApplicationContext(), NowPlaying.class);
@@ -296,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
                         mediaController.getTransportControls().skipToNext();
                         break;
                 }
-            }
+            //}
         }
     }
 }

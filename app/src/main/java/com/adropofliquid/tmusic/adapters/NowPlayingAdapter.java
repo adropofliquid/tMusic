@@ -1,8 +1,6 @@
 package com.adropofliquid.tmusic.adapters;
 
 import android.app.Activity;
-import android.os.Bundle;
-import android.support.v4.media.session.MediaControllerCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.db.QueueDbHelper;
 import com.adropofliquid.tmusic.items.SongItem;
-import com.adropofliquid.tmusic.service.PlayerService;
-import com.adropofliquid.tmusic.service.Queue;
+import com.adropofliquid.tmusic.player.OldPlayList;
 import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
@@ -25,7 +21,7 @@ public class NowPlayingAdapter extends RecyclerView.Adapter<NowPlayingAdapter.My
 
     public NowPlayingAdapter(Activity activity) {
         this.activity = activity;
-        this.songList = Queue.getQueue();
+        this.songList = OldPlayList.getQueue();
     }
 
     @NonNull
