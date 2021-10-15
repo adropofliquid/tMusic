@@ -1,31 +1,24 @@
 package com.adropofliquid.tmusic.player;
 
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.media.MediaBrowserCompat;
-import android.support.v4.media.MediaDescriptionCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 import androidx.media.MediaBrowserServiceCompat;
-import androidx.media.session.MediaButtonReceiver;
-
-import com.adropofliquid.tmusic.App;
-import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.activity.NowPlaying;
 
 import java.util.List;
 
@@ -59,7 +52,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
                         MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player
-//        setNewState(PlaybackStateCompat.STATE_NONE,0); //TODO maybe dis is needed, not sure, if so, make & use handler
 
         // MySessionCallback() has methods that handle callbacks from a media controller
         MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
@@ -82,14 +74,20 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 mediaSession);
 
         Log.d(TAG, "Service Created");
+
+        mediaSession.getController().registerCallback(new MediaControllerCompat.Callback() {
+            @Override
+            public void onMetadataChanged(MediaMetadataCompat metadata) {
+                notification.show();
+            }
+        });
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mediaSession.getController().getTransportControls().stop();
+        super.onDestroy();
         thread.quit();
-
         stopSelf();
     }
 
@@ -178,17 +176,25 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         @Override
         public void onSkipToNext() {
-            tellPlayerTo(PlayerHandler.SKIP_TO_NEXT);
+            if(mediaSession.getController().getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE ||
+                    mediaSession.getController().getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED)
+                tellPlayerTo(PlayerHandler.MOVE_DOWN_QUEUE);
+            else
+                tellPlayerTo(PlayerHandler.SKIP_TO_NEXT);
         }
 
         @Override
         public void onSkipToPrevious() {
-
-            tellPlayerTo(PlayerHandler.SKIP_TO_PREVIOUS);
+            if(mediaSession.getController().getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE ||
+                    mediaSession.getController().getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED)
+                tellPlayerTo(PlayerHandler.MOVE_UP_QUEUE);
+            else
+                tellPlayerTo(PlayerHandler.SKIP_TO_PREVIOUS);
         }
 
         @Override
         public void onSkipToQueueItem(long id) {
+            startService(new Intent(PlayerService.this, PlayerService.class));
             tellPlayerTo((int)id, PlayerHandler.SKIP_TO_QUEUE_ITEM);
         }
 
@@ -213,9 +219,11 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 case "PlayUpdate":
                     tellPlayerTo(PlayerHandler.START_PLAYBACKSTATE_UPDATE);
                     break;
-                case "SetNotification":
-                    notification.show(); //FIXME handler is telling service to set notification
-
+                case "MoveDownQueue":
+                    tellPlayerTo(PlayerHandler.MOVE_DOWN_QUEUE);
+                    break;
+                case "MoveUpQueue":
+                    tellPlayerTo(PlayerHandler.MOVE_UP_QUEUE);
                     break;
             }
         }
@@ -253,6 +261,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             }
 
             mediaSession.setShuffleMode(shuffleMode)*/;
+            mediaSession.setShuffleMode(shuffleMode);
         }
 
         @Override
@@ -307,4 +316,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
         }
 
     }
+
+
 }

@@ -2,12 +2,11 @@ package com.adropofliquid.tmusic.items;
 
 import android.content.ContentUris;
 import android.net.Uri;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity
@@ -28,8 +27,11 @@ public class SongItem{
     @ColumnInfo(name = "duration")
     private int duration;
 
-    @ColumnInfo(name = "position")
-    private int position;
+    @ColumnInfo(name = "songId")
+    private int songId;
+
+    @ColumnInfo(name = "playOrder")
+    private int playOrder;
 
     private long albumId;
     private long artistId;
@@ -39,13 +41,15 @@ public class SongItem{
 
     public SongItem(){}
 
+    @Ignore
     public SongItem(int songType) {
         this.songType = songType;
         this.title = "0";
     }
 
+    @Ignore
     public SongItem(int id, String title, String artist,String album,
-                    long albumId, int songType, int duration, long artistId, int position) {
+                    long albumId, int songType, int duration, long artistId, int songId, int playOrder) {
         this.id = id;
         this.albumId = albumId;
         this.artist = artist;
@@ -54,11 +58,12 @@ public class SongItem{
         this.album = album;
         this.duration = duration;
         this.artistId = artistId;
-        this.position = position;
+        this.songId = songId;
+        this.playOrder = playOrder;
     }
 
-    public int getPosition(){
-        return position;
+    public int getSongId(){
+        return songId;
     }
 
     public String getTitle() {
@@ -80,7 +85,7 @@ public class SongItem{
 
     public Uri getUri(){
         return ContentUris.withAppendedId(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songId);
     }
 
     public int getId(){
@@ -119,8 +124,8 @@ public class SongItem{
         this.duration = duration;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
+    public void setSongId(int songId) {
+        this.songId = songId;
     }
 
     public void setAlbumId(long albumId) {
@@ -146,5 +151,14 @@ public class SongItem{
     public static int getTypeShuffle() {
         return TYPE_SHUFFLE;
     }
+
+    public int getPlayOrder() {
+        return playOrder;
+    }
+
+    public void setPlayOrder(int playOrder) {
+        this.playOrder = playOrder;
+    }
+
 
 }

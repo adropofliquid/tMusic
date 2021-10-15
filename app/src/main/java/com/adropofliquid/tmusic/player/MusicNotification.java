@@ -14,7 +14,7 @@ import androidx.media.session.MediaButtonReceiver;
 
 import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.activity.NowPlaying;
+import com.adropofliquid.tmusic.views.activity.NowPlaying;
 
 public class MusicNotification {
 

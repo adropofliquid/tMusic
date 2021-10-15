@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/font_list_dark"
     android:theme="@style/Theme.TMusic.NowPlaying"
-    tools:context=".activity.NowPlaying">
+    tools:context=".views.activity.NowPlaying">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
@@ -128,13 +128,5 @@
         app:layout_constraintBottom_toTopOf="@+id/repeat"
         app:layout_constraintEnd_toEndOf="@id/seekBar"
         app:layout_constraintTop_toBottomOf="@id/seekBar" />
-
-    <ImageView
-        android:id="@+id/sleepTimer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/drawer_help" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
