@@ -24,7 +24,6 @@ public class Queue {
     private Context context;
     private Activity activity;
 
-
     public Queue(Context context){
         this.queueDb = ((App)context.getApplicationContext()).getQueueDb(); //weird. Lol
         this.queueDao = queueDb.queueDao();
@@ -126,4 +125,7 @@ public class Queue {
         return lastPlayedStateItem;
     }
 
+    public void setCurrentSong(SongItem song) {
+        currentSong = song;
+    }
 }

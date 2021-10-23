@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.items.ArtistItem;
+import com.adropofliquid.tmusic.views.activity.MainActivity;
 
 import java.util.ArrayList;
 
@@ -36,7 +37,7 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.On
         songArtist = itemView.findViewById(R.id.song_artist);
         songOptions = itemView.findViewById(R.id.song_options);
 
-        itemView.setOnClickListener(v -> playSongList(songList,getAdapterPosition() -1));
+        itemView.setOnClickListener(v -> playSongList(songList,getAdapterPosition()));
         itemView.setOnLongClickListener(v -> {
             showPopup(v);
             return true;
@@ -46,14 +47,8 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.On
         songOptions.setOnClickListener(v -> songOptions.showContextMenu());
     }
 
-    private void playSongList(ArrayList<ArtistItem> songList, int adapterPosition) {
-/*
-        if(MediaControllerCompat.getMediaController(activity).getShuffleMode() == PlaybackStateCompat.SHUFFLE_MODE_GROUP){
-            MediaControllerCompat.getMediaController(activity).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE);
-        }
-        Queue.setQueue(songList);
-        MediaControllerCompat.getMediaController(activity).getTransportControls()
-                .skipToQueueItem(adapterPosition);*/
+    private void playSongList(ArrayList<ArtistItem> artists, int adapterPosition) {
+        ((MainActivity) activity).replaceFragment(MainActivity.ARTIST_LIST_VIEW, artists.get(adapterPosition).getArtist());
     }
 
     public void bindSongsViews(ArtistItem songItem){

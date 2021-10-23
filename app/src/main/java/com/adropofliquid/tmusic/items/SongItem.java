@@ -2,6 +2,9 @@ package com.adropofliquid.tmusic.items;
 
 import android.content.ContentUris;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 
 import androidx.room.ColumnInfo;
@@ -9,8 +12,10 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity
-public class SongItem{
+public class SongItem implements Serializable{
 
     @PrimaryKey
     private int id;
@@ -36,8 +41,9 @@ public class SongItem{
     private long albumId;
     private long artistId;
     private int songType;
-    public static final int TYPE_SONG = 1; // actual song view
-    public static final int TYPE_SHUFFLE = 2; //  shuffle view
+    public static final int TYPE_SONG = 4; // actual song view
+    public static final int TYPE_SHUFFLE = 3; //  shuffle view
+    public static final int TYPE_ALBUM_HEADER = 5; //  album header view
 
     public SongItem(){}
 
@@ -159,6 +165,5 @@ public class SongItem{
     public void setPlayOrder(int playOrder) {
         this.playOrder = playOrder;
     }
-
 
 }

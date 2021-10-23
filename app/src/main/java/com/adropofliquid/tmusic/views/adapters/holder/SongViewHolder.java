@@ -1,8 +1,10 @@
 package com.adropofliquid.tmusic.views.adapters.holder;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -14,11 +16,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.R;
+import com.adropofliquid.tmusic.items.AlbumItem;
 import com.adropofliquid.tmusic.items.SongItem;
 import com.adropofliquid.tmusic.playfromlist.Play;
+import com.adropofliquid.tmusic.queue.Queue;
+import com.adropofliquid.tmusic.views.activity.MainActivity;
 import com.bumptech.glide.Glide;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executor;
 
 public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
     private final ImageView songArt;
@@ -30,7 +38,7 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
 
     public SongViewHolder(Activity activity,
                           @NonNull View itemView,
-                          ArrayList<SongItem> songList) { //constructor
+                          List<SongItem> songList, int offset)  { //constructor
         super(itemView);
 
         this.activity = activity;
@@ -40,7 +48,35 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
         songArtist = itemView.findViewById(R.id.song_artist);
         songOptions = itemView.findViewById(R.id.song_options);
 
-        itemView.setOnClickListener(v -> playSongList(songList,getAdapterPosition() -1));
+        itemView.setOnClickListener(v -> playSongList(songList,getAdapterPosition() - offset));
+        itemView.setOnLongClickListener(v -> {
+            showPopup(v);
+            return true;
+        });
+
+        songOptions.setOnCreateContextMenuListener(this);
+        songOptions.setOnClickListener(v -> songOptions.showContextMenu());
+    }
+
+    public SongViewHolder(Activity activity,
+                          @NonNull View itemView, String album)  { //constructor
+        super(itemView);
+
+        this.activity = activity;
+
+        songArt = itemView.findViewById(R.id.song_art);
+        songName = itemView.findViewById(R.id.song_name);
+        songArtist = itemView.findViewById(R.id.song_artist);
+        songOptions = itemView.findViewById(R.id.song_options);
+
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) activity).replaceFragment(MainActivity.ALBUM_LIST_VIEW, album);
+            }
+        });
+
+        //itemView.setOnClickListener(v -> playSongList(songList,getAdapterPosition() - offset));
         itemView.setOnLongClickListener(v -> {
             showPopup(v);
             return true;
@@ -55,14 +91,19 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
                 .error(R.drawable.miniplayer_default_album_art)
                 .centerCrop()
                 .into(songArt); //set image
-        /*try {
-            songArt.setImageBitmap(MediaStore.Images.Media.getBitmap(activity.getContentResolver(),songItem.getAlbumArtUri()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
 
         songName.setText(songItem.getTitle());
         songArtist.setText(songItem.getArtist());
+    }
+
+    public void bindAlbumViews(AlbumItem albumItem){
+        Glide.with(activity).load(albumItem.getAlbumArtUri())
+                .error(R.drawable.miniplayer_default_album_art)
+                .centerCrop()
+                .into(songArt); //set image
+
+        songName.setText(albumItem.getName());
+//        songArtist.setText(albumItem.getYear());
     }
 
     @Override
@@ -78,30 +119,35 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
         popup.show();
     }
 
-    private void playSongList(ArrayList<SongItem> songList, int adapterPosition) {
+    private void playSongList(List<SongItem> songList, int adapterPosition) {
 
-        MediaControllerCompat.getMediaController(activity).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE);
+        shuffleAndRepeat();
 
-        /*Handler handler = new Handler(Looper.getMainLooper());
-        Queue queue =  new Queue(activity);
-        queue.saveQueueAndPlay(songList, handler, adapterPosition);*/
-//        Queue queue =  new Queue(activity);
-//        queue.saveQueue(songList);
-/*
-        Log.i("Clciked: ",songList.get(adapterPosition).getSongId()+
-                " "+ songList.get(adapterPosition).getId());*/
-//        MediaControllerCompat.getMediaController(activity).getTransportControls()
-//                .skipToQueueItem(adapterPosition);
+        Play play = new Play(activity, songList, adapterPosition, false);
 
-        Play play = new Play(activity,
-                songList,
-                adapterPosition,
-                false);
-        play.saveAndPlay();
-
-
+        play.saveQueue();
+        play.playSelected();
+//        Log.v("Song Album:", songList.get(adapterPosition).getAlbumId()+"");
     }
 
+    private void playSelected(SongItem song){
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("song", song);
 
+        Log.v("The Song",song.getTitle());
+        MediaControllerCompat.getMediaController(activity).getTransportControls()
+                .playFromMediaId("song", bundle);
+    }
 
+    private void saveQueue(List<SongItem> queue){
+        Executor executor = (((App) activity.getApplicationContext()).getExecutor());
+        executor.execute(() -> {
+            new Queue(activity).saveQueue(queue);
+        });
+    }
+
+    private void shuffleAndRepeat(){
+        MediaControllerCompat.getMediaController(activity).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE);
+        MediaControllerCompat.getMediaController(activity).getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_NONE);
+    }
 }

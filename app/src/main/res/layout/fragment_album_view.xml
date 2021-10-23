@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+app:layout_behavior="@string/appbar_scrolling_view_behavior"
+tools:context=".views.fragment.main.AlbumViewFragment"
+android:id="@+id/album_view">
+
+<com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+    android:id="@+id/album_view_recycler"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+
+    app:fastScrollThumbEnabled="true"
+    app:fastScrollPopupBgColor="@color/purple_link"
+    app:fastScrollPopupTextColor="@android:color/white"
+    app:fastScrollThumbColor="@color/purple_link"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

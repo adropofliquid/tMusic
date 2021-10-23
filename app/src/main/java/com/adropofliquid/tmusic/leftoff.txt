@@ -1,10 +1,18 @@
 UI
   MAIN
   drawer navigation
-    FRAGMENT(remove ALBUM & ARTIST temp)
+    FRAGMENT
       update songlist when new song is added
       songList is putting lowercase below list
   NOWPLAYING
     Toolbar(transparent)
     fix ViewPager
     blur
+
+
+For MediaStore
+    Create MediaStore Db Loader and set callbacks
+    on the fragments dat need dem incase any changes
+
+maybe handlerThread to save queue
+so can cancel on multiple press

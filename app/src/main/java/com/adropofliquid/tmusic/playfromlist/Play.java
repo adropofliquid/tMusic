@@ -1,23 +1,26 @@
 package com.adropofliquid.tmusic.playfromlist;
 
 import android.app.Activity;
-import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.media.session.MediaControllerCompat;
 
+import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.items.SongItem;
 import com.adropofliquid.tmusic.queue.Queue;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public class Play {
 
     private final Activity activity;
     private final List<SongItem> songList;
-    private final int songPosition;
+    private int songPosition;
     private final boolean shuffle;
     private final Queue queue;
+    private OnShuffledCallback onShuffledCallback;
 
     public Play(Activity activity, List<SongItem> songList, int songPosition, boolean shuffle) {
         this.activity = activity;
@@ -27,12 +30,21 @@ public class Play {
         this.queue =  new Queue(activity);
     }
 
-    public void saveAndPlay() {
-        new SaveQueueAndPlay().execute();
+    public void saveQueue(){
+        Executor executor = (((App) activity.getApplicationContext()).getExecutor());
+        executor.execute(() -> {
+            if(shuffle)
+                updateListPlayOrder();
+            new Queue(activity).saveQueue(songList);
+        });
     }
 
-    public void saveQueue(){
-        queue.saveQueue(songList);
+    public void playSelected(){
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("song", songList.get(songPosition));
+
+        MediaControllerCompat.getMediaController(activity).getTransportControls()
+                .playFromMediaId("song", bundle);
     }
 
     private void updateListPlayOrder() {
@@ -50,35 +62,21 @@ public class Play {
             playOrder.add(i);
         }
         Collections.shuffle(playOrder);
-
+        onShuffledCallback.onShuffled(playOrder.get(0));
         return playOrder;
     }
 
-    public void playFromPosition(){
-        MediaControllerCompat.getMediaController(activity).getTransportControls()
-                .skipToQueueItem(songPosition);
+
+    public void setSongPosition(int position){
+        songPosition = position;
     }
 
-
-
-    private class SaveQueueAndPlay extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... strings) {
-            if(shuffle)
-                updateListPlayOrder();
-
-            saveQueue();
-
-            return "Executed";
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            playFromPosition();
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
+    public void registerOnShuffledCallback(OnShuffledCallback onShuffledCallback){
+        this.onShuffledCallback = onShuffledCallback;
     }
+
+    public interface OnShuffledCallback {
+        void onShuffled(int firstOnList);
+    }
+
 }

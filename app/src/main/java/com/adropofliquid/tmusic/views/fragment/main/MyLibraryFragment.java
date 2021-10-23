@@ -1,5 +1,6 @@
-package com.adropofliquid.tmusic.views.fragment;
+package com.adropofliquid.tmusic.views.fragment.main;
 
+import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,35 +34,31 @@ public class MyLibraryFragment extends Fragment {
 
         ViewPager2 viewPager2 = view.findViewById(R.id.viewPager);
         viewPager2.setAdapter(new ViewPagerFragmentAdapter(getActivity()));
-        // TODO wen u add more pages
-        //  - drag lag viewPager2.setOffscreenPageLimit(3);
+        viewPager2.setOffscreenPageLimit(3);
 
         TabLayout tabLayout = getActivity().findViewById(R.id.library_tabs);
-        /*TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(
-                tabLayout, viewPager2, (tab, position) -> {
-                    switch (position){
-                        case 0:{
-                            tab.setText("PLAYLISTS");
-                            break;}
-                        case 1:{
-                            tab.setText("ARTISTS");
-                            break;}
-                        case 2:{
-                            tab.setText("ALBUMS");
-                            break;}
-                        case 3:{
-                            tab.setText("SONGS");
-                            break;}
-                        case 4:{
-                            tab.setText("GENRES");
-                            break;}
-                    }
-                }
-        );*/
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(
                 tabLayout, viewPager2, (tab, position) -> {
-            tab.setText("SONGS");
-        });
+                    switch (position){
+//                        case 0:{
+//                            tab.setText("PLAYLISTS");
+//                            break;}
+                        case 0:{
+                            tab.setText("ARTISTS");
+                            break;}
+                        case 1:{
+                            tab.setText("ALBUMS");
+                            break;}
+                        case 2:{
+                            tab.setText("SONGS");
+                            break;}
+//                        case 4:{
+//                            tab.setText("GENRES");
+//                            break;}
+                    }
+                }
+        );
+
         tabLayoutMediator.attach();
 
 //        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
@@ -71,4 +68,5 @@ public class MyLibraryFragment extends Fragment {
         getSupportActionBar().setTitle(R.string.toolbar_my_library);
         getSupportActionBar().setDisplayShowTitleEnabled(true);*/
     }
+
 }

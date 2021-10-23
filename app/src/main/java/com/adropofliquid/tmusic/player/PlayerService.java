@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.HandlerThread;
@@ -19,6 +20,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media.MediaBrowserServiceCompat;
+
+import com.adropofliquid.tmusic.items.SongItem;
 
 import java.util.List;
 
@@ -125,7 +128,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
     private class MediaSessionCallback extends MediaSessionCompat.Callback {
 
         private void tellPlayerTo(int doWhat){
-
             Message msg = playerHandler.obtainMessage();
             msg.what = doWhat;
             playerHandler.sendMessage(msg);
@@ -196,6 +198,18 @@ public class PlayerService extends MediaBrowserServiceCompat {
         public void onSkipToQueueItem(long id) {
             startService(new Intent(PlayerService.this, PlayerService.class));
             tellPlayerTo((int)id, PlayerHandler.SKIP_TO_QUEUE_ITEM);
+        }
+
+        @Override
+        public void onPlayFromMediaId(String mediaId, Bundle extras) {
+            startService(new Intent(PlayerService.this, PlayerService.class));
+
+            Message msg = playerHandler.obtainMessage();
+//            msg.obj = extras.getSerializable("song");
+            msg.what = PlayerHandler.PLAY_FROM_MEDIA_URI;
+            msg.setData(extras);
+            playerHandler.sendMessage(msg);
+
         }
 
         @Override

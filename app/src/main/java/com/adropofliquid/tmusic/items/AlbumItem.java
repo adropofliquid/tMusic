@@ -6,44 +6,25 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 
-public class AlbumItem implements Parcelable {
+public class AlbumItem {
 
     private long id;
+    private int year;
     private String name;
     private String artist;
 
-    public AlbumItem(long id, String name, String artist)
+    public AlbumItem(){}
+    public AlbumItem(long id, String name, String artist, int year)
     {
         this.id = id;
         this.name = name;
         this.artist = artist;
+        this.year = year;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(id);
-        parcel.writeString(name);
-        parcel.writeString(artist);
+    public long getId(){
+        return id;
     }
-
-    protected AlbumItem(Parcel in) {
-        id = in.readLong();
-        name = in.readString();
-        artist = in.readString();
-    }
-
-    public static final Creator<AlbumItem> CREATOR = new Creator<AlbumItem>() {
-        @Override
-        public AlbumItem createFromParcel(Parcel in) {
-            return new AlbumItem(in);
-        }
-
-        @Override
-        public AlbumItem[] newArray(int size) {
-            return new AlbumItem[size];
-        }
-    };
-
     public String getArtist() {
         return artist;
     }
@@ -57,9 +38,7 @@ public class AlbumItem implements Parcelable {
         return name;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public int getYear() {
+        return year;
     }
-
 }

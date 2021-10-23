@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.items.AlbumItem;
+import com.adropofliquid.tmusic.views.activity.MainActivity;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class AlbumViewHolder extends RecyclerView.ViewHolder implements View.OnC
         songArtist = itemView.findViewById(R.id.song_artist);
         songOptions = itemView.findViewById(R.id.song_options);
 
-        itemView.setOnClickListener(v -> playSongList(songList,getAdapterPosition() -1));
+        itemView.setOnClickListener(v -> viewAlbumSongs(songList,getAdapterPosition()));
         itemView.setOnLongClickListener(v -> {
             showPopup(v);
             return true;
@@ -47,26 +48,17 @@ public class AlbumViewHolder extends RecyclerView.ViewHolder implements View.OnC
         songOptions.setOnClickListener(v -> songOptions.showContextMenu());
     }
 
-    private void playSongList(ArrayList<AlbumItem> songList, int adapterPosition) {
-/*
-        if(MediaControllerCompat.getMediaController(activity).getShuffleMode() == PlaybackStateCompat.SHUFFLE_MODE_GROUP){
-            MediaControllerCompat.getMediaController(activity).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE);
-        }
-        Queue.setQueue(songList);
-        MediaControllerCompat.getMediaController(activity).getTransportControls()
-                .skipToQueueItem(adapterPosition);*/
+    private void viewAlbumSongs(ArrayList<AlbumItem> albums, int adapterPosition) {
+        ((MainActivity) activity).replaceFragment(MainActivity.ALBUM_LIST_VIEW, albums.get(adapterPosition).getName());
+        //logList(albums, adapterPosition);
+        //Log.v("Album", albums.get(adapterPosition).getId()+"");
     }
 
     public void bindSongsViews(AlbumItem songItem){
         Glide.with(activity).load(songItem.getAlbumArtUri())
                 .error(R.drawable.miniplayer_default_album_art)
                 .centerCrop()
-                .into(songArt); //set image
-        /*try {
-            songArt.setImageBitmap(MediaStore.Images.Media.getBitmap(activity.getContentResolver(),songItem.getAlbumArtUri()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+                .into(songArt);
 
         songName.setText(songItem.getName());
         songArtist.setText(songItem.getArtist());

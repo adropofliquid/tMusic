@@ -12,34 +12,27 @@ public class ViewPagerFragmentAdapter extends FragmentStateAdapter {
     public ViewPagerFragmentAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
     }
-/*
+
 
     @NonNull
     @Override
     public Fragment createFragment(int position) {
         switch (position) {
+//            case 0:
+//                return new PlaylistFragment();
             case 0:
-                return new PlaylistFragment();
-            case 1:
                 return new ArtistsFragment();
-            case 2:
+            case 1:
                 return new AlbumsFragment();
-            case 3:
-                return new SongsFragment();
             default:
-                return new GenresFragment();
+                return new SongsFragment();
+//            default:
+//                return new GenresFragment();
         }
     }
-*/
 
-    @NonNull
-    @Override
-    public Fragment createFragment(int position) {
-
-        return new SongsFragment();
-    }
     @Override
     public int getItemCount() {
-        return 1;
+        return 3;
     }
 }

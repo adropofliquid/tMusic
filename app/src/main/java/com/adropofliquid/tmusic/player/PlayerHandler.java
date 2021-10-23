@@ -2,6 +2,7 @@ package com.adropofliquid.tmusic.player;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -32,6 +33,7 @@ public class PlayerHandler extends Handler {
     public static final int PLAY_FROM_LAST_PLAYED = 11;
     public static final int MOVE_DOWN_QUEUE = 12;
     public static final int MOVE_UP_QUEUE = 13;
+    public static final int PLAY_FROM_MEDIA_URI = 14;
     private static final String TAG = "Player Handler";
     private final Context context;
     private final Queue queue;
@@ -52,6 +54,9 @@ public class PlayerHandler extends Handler {
     public void handleMessage(Message msg) {
 
         switch(msg.what){
+            case PLAY_FROM_MEDIA_URI:
+                onPlayFromMediaId(msg.getData());
+                break;
             case SKIP_TO_QUEUE_ITEM:
                 onSkipToQueueItem(msg.arg1);
                 break;
@@ -95,6 +100,8 @@ public class PlayerHandler extends Handler {
 
     }
 
+
+
     @SuppressLint("WrongConstant")
     private void prepareLastPlayed(){
         post(() -> {
@@ -112,6 +119,15 @@ public class PlayerHandler extends Handler {
                 setNewMetadata();
             }
         });
+    }
+
+    private void onPlayFromMediaId(Bundle bundle) {
+//FIXME check if dis speeds anytin        stopPlaybackStateUpdate();
+
+        setNewState(PlaybackStateCompat.STATE_PLAYING, 0);
+
+        queue.setCurrentSong((SongItem) bundle.getSerializable("song"));
+        mediaSession.getController().getTransportControls().play();
     }
 
     private void onPlay() {
@@ -311,7 +327,10 @@ public class PlayerHandler extends Handler {
     }
 
     private void setNewMetadata() {
+        mediaSession.setMetadata(buildMetadata());
+    }
 
+    private MediaMetadataCompat buildMetadata(){
         SongItem currentSong = queue.getCurrentSong();
 
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
@@ -328,7 +347,7 @@ public class PlayerHandler extends Handler {
         builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION,currentSong.getDuration());
         builder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, currentSong.getId());
 
-        mediaSession.setMetadata(builder.build());
+        return builder.build();
     }
 
     private void setNewState(@PlaybackStateCompat.State int newState, long playPosition) {

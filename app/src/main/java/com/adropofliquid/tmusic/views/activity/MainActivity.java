@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
 
 import android.content.ComponentName;
 import android.content.Intent;
@@ -24,17 +25,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.adropofliquid.tmusic.permissions.SystemPermissions;
-import com.adropofliquid.tmusic.views.fragment.MyLibraryFragment;
+import com.adropofliquid.tmusic.views.fragment.main.ArtistViewFragment;
+import com.adropofliquid.tmusic.views.fragment.main.MyLibraryFragment;
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.items.LastPlayedStateItem;
 import com.adropofliquid.tmusic.items.SongItem;
 import com.adropofliquid.tmusic.player.PlayerService;
 import com.adropofliquid.tmusic.queue.Queue;
+import com.adropofliquid.tmusic.views.fragment.main.TempSongsFragment;
+import com.adropofliquid.tmusic.views.fragment.mylibrary.SongsFragment;
+import com.adropofliquid.tmusic.views.fragment.mylibrary.SongsListFragment;
 import com.bumptech.glide.Glide;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int REQUEST_STORAGE = 1;
+    public static final int ALBUM_LIST_VIEW = 3;
+    public static final int ARTIST_LIST_VIEW = 4;
+    public static final int SONG_LIST_VIEW = 5;
     private static final String TAG = "MainActivity: ";
 
     private MediaBrowserCompat mediaBrowser;
@@ -48,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton bottomPlayerPlay;
     private ImageButton bottomPlayerNext;
     private boolean enableBottomButtons;
+    TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,12 +81,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void initializeViews(Bundle savedInstanceState){
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.my_library);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
-
+        tabLayout = findViewById(R.id.library_tabs);
 
         bottomPlayerImage = findViewById(R.id.bottom_player_image);
         bottomPlayerTitle = findViewById(R.id.bottom_player_name);
@@ -104,13 +114,60 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void replaceFragment(int which, String album){
+        Fragment fragment;
+
+        if(which == ALBUM_LIST_VIEW){
+            fragment = new SongsListFragment(album);
+        }
+        else if(which == SONG_LIST_VIEW){
+            fragment = new TempSongsFragment(album);
+        }
+        else {
+            fragment = new ArtistViewFragment(album);
+        }
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container_view, fragment)
+                    .addToBackStack("")
+                    .commit();
+
+            tabLayout.setVisibility(View.GONE);
+    }
+
+//    public void replaceFragment(int which, int details){
+//        Fragment fragment;
+//
+//        if(which == ALBUM_LIST_VIEW){
+//            fragment = new SongsListFragment(details);
+//        }
+//        else if(which == SONG_LIST_VIEW){
+//            fragment = new TempSongsFragment(details);
+//        }
+//        else {
+//            fragment = new ArtistViewFragment(details);
+//        }
+//
+//        getSupportFragmentManager()
+//                .beginTransaction()
+//                .replace(R.id.fragment_container_view, fragment)
+//                .addToBackStack("")
+//                .commit();
+//
+//        tabLayout.setVisibility(View.GONE);
+//    }
+
+    public void showTabLayout(){
+        tabLayout.setVisibility(View.VISIBLE);
+    }
+
     private void initializeMediaBrowser(){ //creates player Service
         mediaBrowser = new MediaBrowserCompat(this,
                 new ComponentName(this, PlayerService.class),
                 connectionCallbacks,
                 null);
     }
-
     private void buildTransportControls() {
 
         new LoadLastPlayed().execute();

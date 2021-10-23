@@ -12,17 +12,18 @@ import com.adropofliquid.tmusic.items.SongItem;
 import com.adropofliquid.tmusic.playfromlist.Play;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ShuffleViewHolder extends RecyclerView.ViewHolder{
 
-    public ShuffleViewHolder(Activity activity, @NonNull View itemView, ArrayList<SongItem> songList) { //constructor
+    public ShuffleViewHolder(Activity activity, @NonNull View itemView, List<SongItem> songList) { //constructor
         super(itemView);
         itemView.setOnClickListener(v -> shuffleAllSongs(activity,songList));
     }
     public void bindShuffleView(){
         //already hardcoded
     }
-    private void shuffleAllSongs(Activity activity, ArrayList<SongItem> songList) {
+    private void shuffleAllSongs(Activity activity, List<SongItem> songList) {
 
         MediaControllerCompat.getMediaController(activity).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_ALL);
 
@@ -31,7 +32,12 @@ public class ShuffleViewHolder extends RecyclerView.ViewHolder{
                 0,
                 true);
 
-        play.saveAndPlay();
+        play.saveQueue();
+
+        play.registerOnShuffledCallback(firstOnList -> {
+            play.setSongPosition(firstOnList);
+            play.playSelected();
+        });
 
     }
 
