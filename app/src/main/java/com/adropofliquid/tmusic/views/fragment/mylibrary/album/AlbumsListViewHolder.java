@@ -1,4 +1,4 @@
-package com.adropofliquid.tmusic.views.adapters.holder;
+package com.adropofliquid.tmusic.views.fragment.mylibrary.album;
 
 import android.app.Activity;
 import android.view.ContextMenu;
@@ -13,12 +13,14 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.items.ArtistItem;
+import com.adropofliquid.tmusic.items.AlbumItem;
 import com.adropofliquid.tmusic.views.activity.MainActivity;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
+
+public class AlbumsListViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
     private final ImageView songArt;
     private final TextView songName;
     private final TextView songArtist;
@@ -26,9 +28,9 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.On
     private final Activity activity;
 
 
-    public ArtistViewHolder(Activity activity,
-                            @NonNull View itemView,
-                            ArrayList<ArtistItem> songList) { //constructor
+    public AlbumsListViewHolder(Activity activity,
+                                @NonNull View itemView,
+                                ArrayList<AlbumItem> songList) { //constructor
         super(itemView);
         this.activity = activity;
 
@@ -37,7 +39,7 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.On
         songArtist = itemView.findViewById(R.id.song_artist);
         songOptions = itemView.findViewById(R.id.song_options);
 
-        itemView.setOnClickListener(v -> playSongList(songList,getAdapterPosition()));
+        itemView.setOnClickListener(v -> viewAlbumSongs(songList,getAdapterPosition()));
         itemView.setOnLongClickListener(v -> {
             showPopup(v);
             return true;
@@ -47,25 +49,19 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.On
         songOptions.setOnClickListener(v -> songOptions.showContextMenu());
     }
 
-    private void playSongList(ArrayList<ArtistItem> artists, int adapterPosition) {
-        ((MainActivity) activity).replaceFragment(MainActivity.ARTIST_LIST_VIEW, artists.get(adapterPosition).getArtist());
+    private void viewAlbumSongs(ArrayList<AlbumItem> albums, int adapterPosition) {
+        ((MainActivity) activity).replaceFragment(MainActivity.ALBUM_SONGS_LIST_VIEW, albums.get(adapterPosition).getId());
+//        Log.v("AlbumId",albums.get(adapterPosition).getId()+"");
     }
 
-    public void bindSongsViews(ArtistItem songItem){
-        /*Glide.with(activity).load(songItem.getAlbumArtUri())
+    public void bindSongsViews(AlbumItem songItem){
+        Glide.with(activity).load(songItem.getAlbumArtUri())
                 .error(R.drawable.miniplayer_default_album_art)
                 .centerCrop()
-                .into(songArt); //set image*/
-        /*try {
-            songArt.setImageBitmap(MediaStore.Images.Media.getBitmap(activity.getContentResolver(),songItem.getAlbumArtUri()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        songName.setText(songItem.getArtist());
-        if(songItem.getTracks() == 1)
-            songArtist.setText(songItem.getTracks() + " song");
-        else
-            songArtist.setText(songItem.getTracks() + " songs");
+                .into(songArt);
+
+        songName.setText(songItem.getName());
+        songArtist.setText(songItem.getArtist());
     }
 
     @Override
@@ -80,4 +76,5 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.On
         inflater.inflate(R.menu.song_items, popup.getMenu());
         popup.show();
     }
+
 }

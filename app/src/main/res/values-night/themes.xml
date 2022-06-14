@@ -25,6 +25,12 @@
         <item name="android:titleTextColor">@color/white</item>
     </style>
 
+    <style name="PlayerToolBarStyle">
+        <item name="windowActionBar">false</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+    </style>
+
     <style name="SongCard" parent="CardView">
         <item name="android:paddingTop">1dp</item>
         <item name="android:paddingBottom">1dp</item>

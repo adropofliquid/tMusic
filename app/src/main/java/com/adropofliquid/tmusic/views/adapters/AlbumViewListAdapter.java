@@ -12,7 +12,7 @@ import com.adropofliquid.tmusic.items.AlbumHeaderView;
 import com.adropofliquid.tmusic.items.SongItem;
 import com.adropofliquid.tmusic.views.adapters.holder.AlbumHeaderViewHolder;
 import com.adropofliquid.tmusic.views.adapters.holder.ShuffleViewHolder;
-import com.adropofliquid.tmusic.views.adapters.holder.SongViewHolder;
+import com.adropofliquid.tmusic.views.fragment.mylibrary.song.SongViewHolder;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;

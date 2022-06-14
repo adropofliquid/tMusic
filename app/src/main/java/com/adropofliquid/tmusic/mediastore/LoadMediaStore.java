@@ -5,10 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.adropofliquid.tmusic.items.AlbumItem;
 import com.adropofliquid.tmusic.items.ArtistItem;
 import com.adropofliquid.tmusic.items.SongItem;
+import com.adropofliquid.tmusic.views.activity.MainActivity;
+
 import java.util.ArrayList;
 
 public class LoadMediaStore {
@@ -51,7 +54,7 @@ public class LoadMediaStore {
             int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int songArtistId = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
             int songAlbum = songCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-            int albumIdArt = songCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+            int albumId = songCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
 
 
@@ -62,7 +65,7 @@ public class LoadMediaStore {
                 String disArtist = songCursor.getString(songArtist);
                 long disArtistId = songCursor.getLong(songArtistId);
                 String disAlbum = songCursor.getString(songAlbum);
-                long disAlbumId = songCursor.getLong(albumIdArt);
+                long disAlbumId = songCursor.getLong(albumId);
                 int disDuration = songCursor.getInt(songDuration);
                 songList.add(new SongItem(id, disTitle, disArtist,disAlbum,
                         disAlbumId, SongItem.TYPE_SONG,disDuration, disArtistId, disId, id));
@@ -76,18 +79,20 @@ public class LoadMediaStore {
         return songList;
     }
 
-    public ArrayList<SongItem> getSongs(int albumId){
+    public ArrayList<SongItem> getSongs(int type, long pid){
+
+//        Log.v("sumtin entered", pid+"");
+
         ArrayList<SongItem> songList = new ArrayList<>();
 
-//        String selection = MediaStore.Video.Media.DURATION +
-//                " >= ?";
-//        String[] selectionArgs = new String[] {
-//                String.valueOf(TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES));
-//          };
+        String selection;
 
-        String selection = MediaStore.Audio.Media.ALBUM_ID + " = ?";
+        if(type == MainActivity.ALBUM_SONGS_LIST_VIEW)
+            selection = MediaStore.Audio.Media.ALBUM_ID + " = ?";
+        else
+            selection = MediaStore.Audio.Media.ARTIST_ID + " = ?";
 
-        String[] selectionArgs = new String[]{String.valueOf(albumId)};
+        String[] selectionArgs = new String[]{String.valueOf(pid)};
 
         String sortOrder = MediaStore.Audio.Media.TRACK + " ASC";
 
@@ -117,100 +122,7 @@ public class LoadMediaStore {
                 String disAlbum = songCursor.getString(songAlbum);
                 long disAlbumId = songCursor.getLong(albumIdArt);
                 int disDuration = songCursor.getInt(songDuration);
-                songList.add(new SongItem(id, disTitle, disArtist,disAlbum,
-                        disAlbumId, SongItem.TYPE_SONG,disDuration, disArtistId, disId, id));
-
-            }
-            while (songCursor.moveToNext());
-        }
-        if (songCursor != null) {
-            songCursor.close();
-        }
-        return songList;
-    }
-
-    public ArrayList<SongItem> getSongs(String album){
-        ArrayList<SongItem> songList = new ArrayList<>();
-
-        String selection = MediaStore.Audio.Media.ALBUM + " = ?";
-
-        String[] selectionArgs = new String[]{String.valueOf(album)};
-
-        String sortOrder = MediaStore.Audio.Media.TRACK + " ASC";
-
-        ContentResolver contentResolver = context.getContentResolver();
-        Uri songLink = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-        Cursor songCursor = contentResolver.query(songLink, songProjection(), selection, selectionArgs, sortOrder);
-
-        if (songCursor != null && songCursor.moveToFirst())
-        {
-            int id = -1;
-            int songId = songCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int songArtistId = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
-            int songAlbum = songCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-            int albumIdArt = songCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-            int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-
-
-            do {
-                id = id + 1;
-                int disId = songCursor.getInt(songId);
-                String disTitle = songCursor.getString(songTitle);
-                String disArtist = songCursor.getString(songArtist);
-                long disArtistId = songCursor.getLong(songArtistId);
-                String disAlbum = songCursor.getString(songAlbum);
-                long disAlbumId = songCursor.getLong(albumIdArt);
-                int disDuration = songCursor.getInt(songDuration);
-                songList.add(new SongItem(id, disTitle, disArtist,disAlbum,
-                        disAlbumId, SongItem.TYPE_SONG,disDuration, disArtistId, disId, id));
-
-            }
-            while (songCursor.moveToNext());
-        }
-        if (songCursor != null) {
-            songCursor.close();
-        }
-        return songList;
-    }
-
-    public ArrayList<SongItem> getSongsByArtist(String artist){
-        ArrayList<SongItem> songList = new ArrayList<>();
-
-        String selection = MediaStore.Audio.Media.ARTIST + " = ?";
-
-        String[] selectionArgs = new String[]{artist};
-
-        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
-
-        ContentResolver contentResolver = context.getContentResolver();
-        Uri songLink = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-        Cursor songCursor = contentResolver.query(songLink, songProjection(), selection, selectionArgs, sortOrder);
-
-        if (songCursor != null && songCursor.moveToFirst())
-        {
-            int id = -1;
-            int songId = songCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int songArtistId = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
-            int songAlbum = songCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-            int albumIdArt = songCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-            int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-
-
-            do {
-                id = id + 1;
-                int disId = songCursor.getInt(songId);
-                String disTitle = songCursor.getString(songTitle);
-                String disArtist = songCursor.getString(songArtist);
-                long disArtistId = songCursor.getLong(songArtistId);
-                String disAlbum = songCursor.getString(songAlbum);
-                long disAlbumId = songCursor.getLong(albumIdArt);
-                int disDuration = songCursor.getInt(songDuration);
+                Log.v("Added", disTitle);
                 songList.add(new SongItem(id, disTitle, disArtist,disAlbum,
                         disAlbumId, SongItem.TYPE_SONG,disDuration, disArtistId, disId, id));
 
@@ -262,18 +174,20 @@ public class LoadMediaStore {
         return albumList;
     }
 
-    public ArrayList<AlbumItem> getAlbums(String artistName) {
+    public ArrayList<AlbumItem> getAlbums(long artistId) {
+
+//        System.out.println(artistId);
         ArrayList<AlbumItem> albumList = new ArrayList<>();
 
-        String selection = MediaStore.Audio.Media.ARTIST + " = ?";
+        String selection = MediaStore.Audio.Media.ARTIST_ID + " = ?";
 
-        String[] selectionArgs = new String[]{String.valueOf(artistName)};
+        String[] selectionArgs = new String[]{String.valueOf(artistId)};
 
         String[] projection = new String[] {
                 MediaStore.Audio.Albums._ID,
                 MediaStore.Audio.Albums.ALBUM,
                 MediaStore.Audio.Albums.ARTIST,
-                MediaStore.Audio.Albums.FIRST_YEAR
+                MediaStore.Audio.Albums.LAST_YEAR
         };
 
         String sortOrder = MediaStore.Audio.Albums.ARTIST + " ASC";
@@ -288,7 +202,7 @@ public class LoadMediaStore {
             int album = cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM);
             int artist = cursor.getColumnIndex(MediaStore.Audio.Albums.ARTIST);
             int album_id = cursor.getColumnIndex(MediaStore.Audio.Albums._ID);
-            int year = cursor.getColumnIndex(MediaStore.Audio.Albums.FIRST_YEAR);
+            int year = cursor.getColumnIndex(MediaStore.Audio.Albums.LAST_YEAR);
 
             do {
                 String disArtist = cursor.getString(artist);
@@ -309,6 +223,7 @@ public class LoadMediaStore {
         ArrayList<ArtistItem> artistItems = new ArrayList<>();
 
         String[] projection = new String[] {
+                MediaStore.Audio.Artists._ID,
                 MediaStore.Audio.Artists.ARTIST,
                 MediaStore.Audio.Artists.NUMBER_OF_TRACKS
         };
@@ -322,14 +237,17 @@ public class LoadMediaStore {
 
         if (cursor != null && cursor.moveToFirst())
         {
+            int id = cursor.getColumnIndex(MediaStore.Audio.Artists._ID);
             int artist = cursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST);
             int num_tracks = cursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS);
 
             do {
+
+                long disId = cursor.getLong(id);
                 String disArtist = cursor.getString(artist);
                 long disNum = cursor.getLong(num_tracks);
 
-                artistItems.add(new ArtistItem(disArtist, disNum));
+                artistItems.add(new ArtistItem(disId,disArtist, disNum));
             }
             while (cursor.moveToNext());
         }

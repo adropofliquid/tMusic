@@ -1,10 +1,8 @@
-package com.adropofliquid.tmusic.views.adapters.holder;
+package com.adropofliquid.tmusic.views.fragment.mylibrary.song;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -16,17 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.items.AlbumItem;
 import com.adropofliquid.tmusic.items.SongItem;
 import com.adropofliquid.tmusic.playfromlist.Play;
-import com.adropofliquid.tmusic.queue.Queue;
 import com.adropofliquid.tmusic.views.activity.MainActivity;
 import com.bumptech.glide.Glide;
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.concurrent.Executor;
 
 public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
     private final ImageView songArt;
@@ -59,7 +54,7 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
     }
 
     public SongViewHolder(Activity activity,
-                          @NonNull View itemView, String album)  { //constructor
+                          @NonNull View itemView, int album)  { //constructor
         super(itemView);
 
         this.activity = activity;
@@ -69,12 +64,7 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
         songArtist = itemView.findViewById(R.id.song_artist);
         songOptions = itemView.findViewById(R.id.song_options);
 
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity) activity).replaceFragment(MainActivity.ALBUM_LIST_VIEW, album);
-            }
-        });
+        itemView.setOnClickListener(v -> ((MainActivity) activity).replaceFragment(MainActivity.ALBUM_SONGS_LIST_VIEW, album));
 
         //itemView.setOnClickListener(v -> playSongList(songList,getAdapterPosition() - offset));
         itemView.setOnLongClickListener(v -> {
@@ -103,7 +93,7 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
                 .into(songArt); //set image
 
         songName.setText(albumItem.getName());
-//        songArtist.setText(albumItem.getYear());
+        //songArtist.setText(albumItem.getYear());
     }
 
     @Override
@@ -128,22 +118,6 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
         play.saveQueue();
         play.playSelected();
 //        Log.v("Song Album:", songList.get(adapterPosition).getAlbumId()+"");
-    }
-
-    private void playSelected(SongItem song){
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("song", song);
-
-        Log.v("The Song",song.getTitle());
-        MediaControllerCompat.getMediaController(activity).getTransportControls()
-                .playFromMediaId("song", bundle);
-    }
-
-    private void saveQueue(List<SongItem> queue){
-        Executor executor = (((App) activity.getApplicationContext()).getExecutor());
-        executor.execute(() -> {
-            new Queue(activity).saveQueue(queue);
-        });
     }
 
     private void shuffleAndRepeat(){

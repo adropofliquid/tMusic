@@ -1,10 +1,12 @@
 package com.adropofliquid.tmusic.views.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.ComponentName;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -23,17 +26,20 @@ import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.views.adapters.NowPlayingAdapter;
 import com.adropofliquid.tmusic.items.LastPlayedStateItem;
 import com.adropofliquid.tmusic.player.PlayerService;
-import com.adropofliquid.tmusic.queue.Queue;
+import com.adropofliquid.tmusic.data.queue.Queue;
+import com.adropofliquid.tmusic.views.dialog.SleepTimerDialog;
 
 
-public class NowPlaying extends AppCompatActivity {
+public class NowPlaying extends AppCompatActivity implements View.OnCreateContextMenuListener{
 
-    private static final String TAG = "NowPlaying: ";
+
+private static final String TAG = "NowPlaying: ";
     private ViewPager2 viewPager2;
     private RecyclerView.Adapter adapter;
     private SeekBar seekBar;
     private TextView durationStart,durationEnd;
     private ImageView playerPrev, playerPlay, playerNext, playerShuffle, playerRepeat;
+    private ImageView toolbarClose, toolbarMore;
 
     private MediaBrowserCompat mediaBrowser;
     private MediaControllerCompat mediaController = null;
@@ -58,34 +64,9 @@ public class NowPlaying extends AppCompatActivity {
         durationStart = findViewById(R.id.durationStart);
         durationEnd = findViewById(R.id.durationEnd);
         seekBar = findViewById(R.id.seekBar);
+        toolbarClose = findViewById(R.id.player_toolbar_close);
+        toolbarMore = findViewById(R.id.player_toolbar_more);
 
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mediaBrowser.connect();
-
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-    }
-    @Override
-    public void onStop() {
-        super.onStop();
-        // (see "stay in sync with the MediaSession")
-        if (mediaController != null) {
-            mediaController.unregisterCallback(controllerCallback);
-        }
-        mediaBrowser.disconnect();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ///stopService(new Intent(this,PlayerService.class));
     }
 
     private final MediaBrowserCompat.ConnectionCallback connectionCallbacks =
@@ -158,6 +139,12 @@ public class NowPlaying extends AppCompatActivity {
     private void buildTransportControls() {
 
         currentSongPosition = 0;
+
+        toolbarClose.setOnClickListener(v -> onBackPressed());
+
+        toolbarMore.setOnCreateContextMenuListener(this);
+
+        toolbarMore.setOnClickListener(v -> showPopup(v));
 
         playerPrev.setOnClickListener(new PlayerOnclickListener());
         playerPlay.setOnClickListener(new PlayerOnclickListener());
@@ -298,6 +285,7 @@ public class NowPlaying extends AppCompatActivity {
                     break;
                 case R.id.shuffle:
                     if(mediaController.getShuffleMode() == PlaybackStateCompat.SHUFFLE_MODE_NONE){
+                        //TODO shuffle in service
                         mediaController.getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_GROUP);
                         Toast.makeText(NowPlaying.this,"Shuffle On",Toast.LENGTH_SHORT).show();
                     }
@@ -349,4 +337,70 @@ public class NowPlaying extends AppCompatActivity {
         // Return timer String;
         return finalTimerString;
     }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mediaBrowser.connect();
+
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        // (see "stay in sync with the MediaSession")
+        if (mediaController != null) {
+            mediaController.unregisterCallback(controllerCallback);
+        }
+        mediaBrowser.disconnect();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(this,PlayerService.class));
+    }
+
+
+    public void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        popup.setOnMenuItemClickListener(popupListener);
+        inflater.inflate(R.menu.now_playing_items, popup.getMenu());
+        popup.show();
+    }
+
+    private PopupMenu.OnMenuItemClickListener popupListener = item -> {
+        switch (item.getItemId()) {
+            case R.id.sleep_timer:
+                showSleepTimerDialog();
+                return true;
+            case R.id.toolbar_player_artist:
+                goToArtist();
+                return true;
+            case R.id.toolbar_player_album:
+                goToAlbum();
+                return true;
+            default:
+                return false;
+        }
+    };
+
+    private void goToAlbum() {
+
+    }
+
+    private void goToArtist() {
+    }
+
+    private void showSleepTimerDialog(){
+        SleepTimerDialog sleepTimerDialog = new SleepTimerDialog(mediaController);
+        sleepTimerDialog.show(getSupportFragmentManager(),"sleep_timer");
+    }
+
 }

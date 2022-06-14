@@ -10,14 +10,12 @@
     <string name="three_dots">⋮</string>
     <string name="shuffle_all">Shuffle all</string>
     <string name="no_song">No Music</string>
-    <string name="artist">Artist</string>
     <string name="add_to_playlist">Add to playlist</string>
     <string name="play_next">Play next</string>
     <string name="add_to_play_queue">Add to play oldQueue</string>
     <string name="add_to_favorites">Add to favorites</string>
     <string name="share">Share</string>
     <string name="delete_from_storage">Delete from storage</string>
-    <string name="album">Album</string>
     <string name="edit_music_info">Edit music info</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -32,4 +30,7 @@
     <string name="help">Help</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+    <string name="sleep_timer">Sleep timer</string>
+    <string name="album">Album</string>
+    <string name="artist">Artist</string>
 </resources>

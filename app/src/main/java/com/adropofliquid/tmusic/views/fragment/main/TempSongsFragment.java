@@ -13,17 +13,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
+import com.adropofliquid.tmusic.mediastore.LoadMediaData;
 import com.adropofliquid.tmusic.mediastore.LoadMediaStore;
-import com.adropofliquid.tmusic.views.adapters.SongListAdapter;
+import com.adropofliquid.tmusic.views.activity.MainActivity;
+import com.adropofliquid.tmusic.views.fragment.mylibrary.song.SongListAdapter;
 
 
 public class TempSongsFragment extends Fragment {
 
-    private RecyclerView.Adapter adapter;
     private RecyclerView recyclerView;
-    private String artist;
+    private long artist;
 
-    public TempSongsFragment(String artist) {
+    public TempSongsFragment(long artist) {
         this.artist = artist;
     }
 
@@ -46,24 +47,7 @@ public class TempSongsFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        new LoadSongs().execute("");
-    }
-
-    private  class LoadSongs extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... strings) {
-            adapter = new SongListAdapter(getActivity(),
-                    new LoadMediaStore(getContext()).getSongsByArtist(artist));
-            return "Executed";
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            recyclerView.setAdapter(adapter);
-        }
-        @Override
-        protected void onPreExecute() {
-        }
+        new LoadMediaData(getActivity(), recyclerView, LoadMediaData.LOAD_SONGS_ARTIST, artist).execute();
     }
 
 }

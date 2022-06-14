@@ -10,11 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.items.AlbumHeaderView;
 import com.adropofliquid.tmusic.items.AlbumItem;
-import com.adropofliquid.tmusic.items.SongItem;
 import com.adropofliquid.tmusic.views.adapters.holder.AlbumHeaderViewHolder;
 import com.adropofliquid.tmusic.views.adapters.holder.AllSongsViewHolder;
-import com.adropofliquid.tmusic.views.adapters.holder.ShuffleViewHolder;
-import com.adropofliquid.tmusic.views.adapters.holder.SongViewHolder;
+import com.adropofliquid.tmusic.views.fragment.mylibrary.song.SongViewHolder;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
@@ -24,9 +22,11 @@ public class ArtistViewListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private static final String TAG = "SongList Adapter: ";
     private ArrayList<AlbumItem> viewAlbumList;
     private ArrayList<AlbumItem> albumList;
+    private long artist;
 
-    public ArtistViewListAdapter(Activity activity, ArrayList<AlbumItem> albumList){
+    public ArtistViewListAdapter(Activity activity, ArrayList<AlbumItem> albumList, long artist){
 
+        this.artist = artist;
         this.activity = activity;
         this.albumList = albumList;
         this.viewAlbumList = new ArrayList<>();
@@ -43,10 +43,10 @@ public class ArtistViewListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 return new AlbumHeaderViewHolder(activity,
                         LayoutInflater.from(parent.getContext()).inflate(R.layout.album_view_header,parent,false));
             case 1:
-                return new AllSongsViewHolder(activity,LayoutInflater.from(parent.getContext()).inflate(R.layout.all_songs_card, parent, false), albumList.get(0).getArtist());
+                return new AllSongsViewHolder(activity,LayoutInflater.from(parent.getContext()).inflate(R.layout.all_songs_card, parent, false), artist);
             default:
                 return new SongViewHolder(activity,
-                        LayoutInflater.from(parent.getContext()).inflate(R.layout.card_song,parent,false), albumList.get(viewType-2).getName());
+                        LayoutInflater.from(parent.getContext()).inflate(R.layout.card_song,parent,false), (int) albumList.get(viewType-2).getId());
         }
     }
 

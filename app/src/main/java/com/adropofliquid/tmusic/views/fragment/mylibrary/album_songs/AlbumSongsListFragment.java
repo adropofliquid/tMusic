@@ -1,4 +1,4 @@
-package com.adropofliquid.tmusic.views.fragment.mylibrary;
+package com.adropofliquid.tmusic.views.fragment.mylibrary.album_songs;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -17,17 +17,16 @@ import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.mediastore.LoadMediaStore;
 import com.adropofliquid.tmusic.views.activity.MainActivity;
 import com.adropofliquid.tmusic.views.adapters.AlbumViewListAdapter;
-import com.adropofliquid.tmusic.views.adapters.SongListAdapter;
 
 
-public class SongsListFragment extends Fragment {
+public class AlbumSongsListFragment extends Fragment {
 
+    private long album;
     private RecyclerView.Adapter adapter;
     private RecyclerView recyclerView;
-    private String albumId;
 
-    public SongsListFragment(String albumId) {
-        this.albumId = albumId;
+    public AlbumSongsListFragment(long album) {
+        this.album = album;
     }
 
     @Override
@@ -36,6 +35,7 @@ public class SongsListFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_album_view, container, false);
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         populateRecycler(view);
@@ -54,23 +54,31 @@ public class SongsListFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        new LoadSongs().execute();
+
+//        new LoadMediaData(getActivity(),
+//                recyclerView,
+//                LoadMediaData.LOAD_SONGS_ALBUM,
+//                album)
+//                .execute();
+
+        new LoadMedia().execute();
     }
 
-    private  class LoadSongs extends AsyncTask<String, Void, String> {
+
+    public class LoadMedia extends AsyncTask<String, Void, String> {
+
 
         @Override
         protected String doInBackground(String... strings) {
-            adapter = new AlbumViewListAdapter(getActivity(),
-                    new LoadMediaStore(getContext()).getSongs(albumId));
+            adapter = new AlbumViewListAdapter(getActivity(), new LoadMediaStore(getActivity()).getSongs(
+                    MainActivity.ALBUM_SONGS_LIST_VIEW, album));
+
             return "Executed";
         }
+
         @Override
         protected void onPostExecute(String result) {
             recyclerView.setAdapter(adapter);
-        }
-        @Override
-        protected void onPreExecute() {
         }
     }
 }

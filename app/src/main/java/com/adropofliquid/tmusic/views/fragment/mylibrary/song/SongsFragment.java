@@ -1,6 +1,5 @@
-package com.adropofliquid.tmusic.views.fragment.mylibrary;
+package com.adropofliquid.tmusic.views.fragment.mylibrary.song;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,17 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.views.adapters.SongListAdapter;
-import com.adropofliquid.tmusic.mediastore.LoadMediaStore;
+import com.adropofliquid.tmusic.mediastore.LoadMediaData;
 
 
 public class SongsFragment extends Fragment {
 
-    private RecyclerView.Adapter adapter;
-    private RecyclerView recyclerView;
 
-    public SongsFragment() {
-    }
+    private RecyclerView recyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -34,6 +29,7 @@ public class SongsFragment extends Fragment {
     }
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         populateRecycler(view);
     }
 
@@ -45,24 +41,6 @@ public class SongsFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        new LoadSongs().execute("");
+        new LoadMediaData(getActivity(),  recyclerView, LoadMediaData.LOAD_ALL_SONG).execute();
     }
-
-    private  class LoadSongs extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... strings) {
-            adapter = new SongListAdapter(getActivity(),
-                    new LoadMediaStore(getContext()).getAllSongs());
-            return "Executed";
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            recyclerView.setAdapter(adapter);
-        }
-        @Override
-        protected void onPreExecute() {
-        }
-    }
-
 }

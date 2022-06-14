@@ -276,6 +276,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
             mediaSession.setShuffleMode(shuffleMode)*/;
             mediaSession.setShuffleMode(shuffleMode);
+            tellPlayerTo(PlayerHandler.SHUFFLE_PLAYQUEUE);
         }
 
         @Override
@@ -302,7 +303,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                         // Song plays wen call is dropped
 
                         if (mediaSession.getController().getPlaybackState().getState() != PlaybackStateCompat.STATE_PLAYING) {
-                            onPlay();
+                            //onPlay();
                         } else if (mediaSession.getController().getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING) {
                             setVolume(MEDIA_VOLUME_DEFAULT);
 

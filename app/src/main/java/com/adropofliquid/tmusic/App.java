@@ -7,7 +7,8 @@ import android.os.Build;
 
 import androidx.room.Room;
 
-import com.adropofliquid.tmusic.queue.room.QueueDb;
+import com.adropofliquid.tmusic.room.QueueDb;
+import com.adropofliquid.tmusic.room.SongRoom;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -17,6 +18,7 @@ public class App extends Application {
 
     public static final String CHANNEL_ID = "Music";
     QueueDb queueDb;
+    SongRoom songRoom;
     ExecutorService executorService;
 
     @Override
@@ -24,6 +26,8 @@ public class App extends Application {
         super.onCreate();
         createChannel();
         queueDb = Room.databaseBuilder(this, QueueDb.class, "queue").allowMainThreadQueries().fallbackToDestructiveMigration().build();
+        songRoom = Room.databaseBuilder(this, SongRoom.class, "songs").allowMainThreadQueries().fallbackToDestructiveMigration().build(); //FIXME maybe disallow mainthread queries
+
         executorService = Executors.newFixedThreadPool(4);
 
     }
@@ -54,9 +58,14 @@ public class App extends Application {
         return executorService;
     }
 
+    public SongRoom getSongRoom(){
+        return songRoom;
+    }
+
     @Override
     public void onTerminate() {
         super.onTerminate();
         queueDb.close();
+        songRoom.close();
     }
 }

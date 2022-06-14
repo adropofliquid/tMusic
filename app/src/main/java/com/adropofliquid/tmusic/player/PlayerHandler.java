@@ -13,7 +13,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
 import com.adropofliquid.tmusic.items.SongItem;
-import com.adropofliquid.tmusic.queue.Queue;
+import com.adropofliquid.tmusic.data.queue.Queue;
 
 import java.io.IOException;
 
@@ -34,6 +34,7 @@ public class PlayerHandler extends Handler {
     public static final int MOVE_DOWN_QUEUE = 12;
     public static final int MOVE_UP_QUEUE = 13;
     public static final int PLAY_FROM_MEDIA_URI = 14;
+    public static final int SHUFFLE_PLAYQUEUE = 15;
     private static final String TAG = "Player Handler";
     private final Context context;
     private final Queue queue;
@@ -96,9 +97,13 @@ public class PlayerHandler extends Handler {
             case MOVE_UP_QUEUE:
                 moveUpQueue();
                 break;
+            case SHUFFLE_PLAYQUEUE:
+                shuffleQueue();
+                break;
         }
 
     }
+
 
 
 
@@ -406,5 +411,9 @@ public class PlayerHandler extends Handler {
         setNewMetadata();
         setNewState(PlaybackStateCompat.STATE_PAUSED, 0);
         stopPlaybackStateUpdate();
+    }
+
+    private void shuffleQueue() {
+
     }
 }

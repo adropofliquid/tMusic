@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.views.adapters.SongListAdapter;
+import com.adropofliquid.tmusic.views.fragment.mylibrary.song.SongListAdapter;
 import com.adropofliquid.tmusic.mediastore.LoadMediaStore;
 import com.adropofliquid.tmusic.views.dialog.NeedPermission;
 import com.adropofliquid.tmusic.player.PlayerService;

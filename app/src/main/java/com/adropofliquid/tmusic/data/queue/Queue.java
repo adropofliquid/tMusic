@@ -1,18 +1,17 @@
-package com.adropofliquid.tmusic.queue;
+package com.adropofliquid.tmusic.data.queue;
 
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
 import com.adropofliquid.tmusic.App;
-import com.adropofliquid.tmusic.queue.room.LastPlatedStateDao;
-import com.adropofliquid.tmusic.queue.room.QueueDao;
-import com.adropofliquid.tmusic.queue.room.QueueDb;
+import com.adropofliquid.tmusic.room.dao.LastPlatedStateDao;
+import com.adropofliquid.tmusic.room.dao.QueueDao;
+import com.adropofliquid.tmusic.room.QueueDb;
 import com.adropofliquid.tmusic.items.LastPlayedStateItem;
 import com.adropofliquid.tmusic.items.SongItem;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 
 public class Queue {
 

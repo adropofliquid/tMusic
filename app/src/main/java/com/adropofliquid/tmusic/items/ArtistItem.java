@@ -3,9 +3,11 @@ package com.adropofliquid.tmusic.items;
 public class ArtistItem {
     private String artist;
     private long tracks;
+    private long id;
 
-    public ArtistItem(String artist, long tracks)
+    public ArtistItem(long id, String artist, long tracks)
     {
+        this.id = id;
         this.tracks = tracks;
         this.artist = artist;
     }
@@ -16,5 +18,9 @@ public class ArtistItem {
 
     public long getTracks() {
         return tracks;
+    }
+
+    public long getId() {
+        return id;
     }
 }

@@ -1,18 +1,13 @@
-UI
-  MAIN
-  drawer navigation
-    FRAGMENT
-      update songlist when new song is added
-      songList is putting lowercase below list
-  NOWPLAYING
-    Toolbar(transparent)
-    fix ViewPager
-    blur
+Sleeptimer to service
+Add to queue
 
-
-For MediaStore
-    Create MediaStore Db Loader and set callbacks
-    on the fragments dat need dem incase any changes
 
 maybe handlerThread to save queue
 so can cancel on multiple press
+
+
+// TODO get songs from  db and save in Room
+// so now we can shuffle anyhow we want
+// or whatever really
+
+//FIXME maybe disallow mainthread queries

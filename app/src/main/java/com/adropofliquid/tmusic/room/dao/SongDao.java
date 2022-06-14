@@ -1,5 +1,6 @@
-package com.adropofliquid.tmusic.queue.room;
+package com.adropofliquid.tmusic.room.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -11,7 +12,7 @@ import com.adropofliquid.tmusic.items.SongItem;
 import java.util.List;
 
 @Dao
-public interface QueueDao {
+public interface SongDao {
 
 /*    @Query("SELECT * FROM queue")
     List<Queue> getAll();

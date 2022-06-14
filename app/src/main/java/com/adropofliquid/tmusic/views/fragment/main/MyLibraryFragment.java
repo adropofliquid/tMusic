@@ -1,6 +1,5 @@
 package com.adropofliquid.tmusic.views.fragment.main;
 
-import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -61,12 +60,6 @@ public class MyLibraryFragment extends Fragment {
 
         tabLayoutMediator.attach();
 
-//        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-        ///TODO How to add ToolBar???
-        /*toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.toolbar_my_library);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);*/
     }
 
 }

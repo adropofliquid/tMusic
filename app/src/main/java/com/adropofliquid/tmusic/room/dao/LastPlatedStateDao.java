@@ -1,13 +1,10 @@
-package com.adropofliquid.tmusic.queue.room;
+package com.adropofliquid.tmusic.room.dao;
 
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.adropofliquid.tmusic.items.LastPlayedStateItem;
-
-import java.util.List;
 
 @Dao
 public interface LastPlatedStateDao {

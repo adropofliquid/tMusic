@@ -25,23 +25,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.adropofliquid.tmusic.permissions.SystemPermissions;
-import com.adropofliquid.tmusic.views.fragment.main.ArtistViewFragment;
+import com.adropofliquid.tmusic.views.fragment.mylibrary.artist_view.ArtistViewFragment;
 import com.adropofliquid.tmusic.views.fragment.main.MyLibraryFragment;
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.items.LastPlayedStateItem;
 import com.adropofliquid.tmusic.items.SongItem;
 import com.adropofliquid.tmusic.player.PlayerService;
-import com.adropofliquid.tmusic.queue.Queue;
+import com.adropofliquid.tmusic.data.queue.Queue;
 import com.adropofliquid.tmusic.views.fragment.main.TempSongsFragment;
-import com.adropofliquid.tmusic.views.fragment.mylibrary.SongsFragment;
-import com.adropofliquid.tmusic.views.fragment.mylibrary.SongsListFragment;
+import com.adropofliquid.tmusic.views.fragment.mylibrary.album_songs.AlbumSongsListFragment;
 import com.bumptech.glide.Glide;
 import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int ALBUM_LIST_VIEW = 3;
+    public static final int ALBUM_SONGS_LIST_VIEW = 3;
     public static final int ARTIST_LIST_VIEW = 4;
     public static final int SONG_LIST_VIEW = 5;
     private static final String TAG = "MainActivity: ";
@@ -57,12 +55,13 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton bottomPlayerPlay;
     private ImageButton bottomPlayerNext;
     private boolean enableBottomButtons;
-    TabLayout tabLayout;
+    private TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         loadMusicPlayer(savedInstanceState);
     }
@@ -92,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         bottomPlayerTitle = findViewById(R.id.bottom_player_name);
         bottomPlayerArtist = findViewById(R.id.bottom_player_artist);
 
-
         progressBar = findViewById(R.id.progressBar);
 
         ConstraintLayout bottomPlayer = findViewById(R.id.bottom_player);
@@ -114,49 +112,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void replaceFragment(int which, String album){
+
+    public void replaceFragment(int which, long details){
         Fragment fragment;
 
-        if(which == ALBUM_LIST_VIEW){
-            fragment = new SongsListFragment(album);
-        }
-        else if(which == SONG_LIST_VIEW){
-            fragment = new TempSongsFragment(album);
-        }
-        else {
-            fragment = new ArtistViewFragment(album);
+        switch (which){
+            case ALBUM_SONGS_LIST_VIEW:
+                fragment = new AlbumSongsListFragment(details);
+                break;
+            case SONG_LIST_VIEW:
+                fragment = new TempSongsFragment(details);
+                break;
+            default:
+                fragment = new ArtistViewFragment(details);
+                break;
+
         }
 
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container_view, fragment)
-                    .addToBackStack("")
-                    .commit();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container_view, fragment)
+                .addToBackStack("")
+                .commit();
 
-            tabLayout.setVisibility(View.GONE);
+        tabLayout.setVisibility(View.GONE);
     }
-
-//    public void replaceFragment(int which, int details){
-//        Fragment fragment;
-//
-//        if(which == ALBUM_LIST_VIEW){
-//            fragment = new SongsListFragment(details);
-//        }
-//        else if(which == SONG_LIST_VIEW){
-//            fragment = new TempSongsFragment(details);
-//        }
-//        else {
-//            fragment = new ArtistViewFragment(details);
-//        }
-//
-//        getSupportFragmentManager()
-//                .beginTransaction()
-//                .replace(R.id.fragment_container_view, fragment)
-//                .addToBackStack("")
-//                .commit();
-//
-//        tabLayout.setVisibility(View.GONE);
-//    }
 
     public void showTabLayout(){
         tabLayout.setVisibility(View.VISIBLE);
@@ -168,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                 connectionCallbacks,
                 null);
     }
+
     private void buildTransportControls() {
 
         new LoadLastPlayed().execute();
@@ -224,7 +205,6 @@ public class MainActivity extends AppCompatActivity {
             new SystemPermissions(this, getSupportFragmentManager()).displayPermissionRationale();
         }
     }
-
 
     private final MediaBrowserCompat.ConnectionCallback connectionCallbacks =
             new MediaBrowserCompat.ConnectionCallback() {
@@ -344,9 +324,10 @@ public class MainActivity extends AppCompatActivity {
             mediaBrowser.disconnect();
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
+
+
 }

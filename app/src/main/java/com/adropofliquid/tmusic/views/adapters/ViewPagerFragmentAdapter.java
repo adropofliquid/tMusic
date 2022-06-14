@@ -4,7 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-import com.adropofliquid.tmusic.views.fragment.mylibrary.*;
+
+import com.adropofliquid.tmusic.views.fragment.mylibrary.album.AlbumsListFragment;
+import com.adropofliquid.tmusic.views.fragment.mylibrary.artist.ArtistsFragment;
+import com.adropofliquid.tmusic.views.fragment.mylibrary.song.SongsFragment;
 
 public class ViewPagerFragmentAdapter extends FragmentStateAdapter {
 
@@ -23,7 +26,7 @@ public class ViewPagerFragmentAdapter extends FragmentStateAdapter {
             case 0:
                 return new ArtistsFragment();
             case 1:
-                return new AlbumsFragment();
+                return new AlbumsListFragment();
             default:
                 return new SongsFragment();
 //            default:

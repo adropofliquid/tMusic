@@ -6,7 +6,7 @@ import android.support.v4.media.session.MediaControllerCompat;
 
 import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.items.SongItem;
-import com.adropofliquid.tmusic.queue.Queue;
+import com.adropofliquid.tmusic.data.queue.Queue;
 
 import java.util.ArrayList;
 import java.util.Collections;

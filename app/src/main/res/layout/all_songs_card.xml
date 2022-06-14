@@ -35,13 +35,12 @@
             android:layout_height="match_parent"
             android:clickable="true"
             android:focusable="true"
-            style="@style/SongCardMore"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:padding="15dp"
             />
-
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class AllSongsViewHolder extends RecyclerView.ViewHolder{
 
-    public AllSongsViewHolder(Activity activity, @NonNull View itemView, String artist) { //constructor
+    public AllSongsViewHolder(Activity activity, @NonNull View itemView, long artist) { //constructor
         super(itemView);
 
         itemView.setOnClickListener(v -> viewAlbumSongs(activity, artist));
@@ -27,7 +27,7 @@ public class AllSongsViewHolder extends RecyclerView.ViewHolder{
         //already hardcoded
     }
 
-    private void viewAlbumSongs(Activity activity,String artist) {
+    private void viewAlbumSongs(Activity activity,long artist) {
         ((MainActivity) activity).replaceFragment(MainActivity.SONG_LIST_VIEW, artist);
     }
 

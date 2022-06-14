@@ -1,4 +1,4 @@
-package com.adropofliquid.tmusic.views.adapters;
+package com.adropofliquid.tmusic.views.fragment.mylibrary.album;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -8,19 +8,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.views.adapters.holder.AlbumViewHolder;
 import com.adropofliquid.tmusic.items.AlbumItem;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
-public class AlbumsAdapter extends RecyclerView.Adapter<AlbumViewHolder> implements FastScrollRecyclerView.SectionedAdapter{
+public class AlbumsListAdapter extends RecyclerView.Adapter<AlbumsListViewHolder> implements FastScrollRecyclerView.SectionedAdapter{
     
     private Activity activity;
     private static final String TAG = "SongList Adapter: ";
     private ArrayList<AlbumItem> albumList;
 
-    public AlbumsAdapter(Activity activity, ArrayList<AlbumItem> songList){
+    public AlbumsListAdapter(Activity activity, ArrayList<AlbumItem> songList){
         this.activity = activity;
         this.albumList = songList;
     }
@@ -28,15 +27,15 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumViewHolder> impleme
 
     @NonNull
     @Override
-    public AlbumViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new AlbumViewHolder(activity,
+    public AlbumsListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new AlbumsListViewHolder(activity,
                     LayoutInflater.from(parent.getContext()).inflate(R.layout.card_song,parent,false),
                     albumList);
         
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AlbumViewHolder holder,final int position) {
+    public void onBindViewHolder(@NonNull AlbumsListViewHolder holder, final int position) {
         holder.bindSongsViews(albumList.get(position));
     }
 

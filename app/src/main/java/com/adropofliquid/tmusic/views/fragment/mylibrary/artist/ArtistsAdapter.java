@@ -1,4 +1,4 @@
-package com.adropofliquid.tmusic.views.adapters;
+package com.adropofliquid.tmusic.views.fragment.mylibrary.artist;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.views.adapters.holder.ArtistViewHolder;
 import com.adropofliquid.tmusic.items.ArtistItem;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
@@ -25,7 +24,6 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistViewHolder> imple
         this.artistList = songList;
     }
 
-
     @NonNull
     @Override
     public ArtistViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -40,13 +38,11 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistViewHolder> imple
         holder.bindSongsViews(artistList.get(position));
     }
 
-
     @NonNull
     @Override
     public String getSectionName(int position) {
         return artistList.get(position).getArtist().substring(0,1);
     }
-
 
     @Override
     public int getItemCount() {
