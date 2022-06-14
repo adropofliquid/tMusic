@@ -5,9 +5,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.adropofliquid.tmusic.views.fragment.mylibrary.album.AlbumsListFragment;
-import com.adropofliquid.tmusic.views.fragment.mylibrary.artist.ArtistsFragment;
-import com.adropofliquid.tmusic.views.fragment.mylibrary.song.SongsFragment;
+import com.adropofliquid.tmusic.views.mylibrary.album.AlbumsListFragment;
+import com.adropofliquid.tmusic.views.mylibrary.artist.ArtistsFragment;
+import com.adropofliquid.tmusic.views.mylibrary.song.SongsFragment;
 
 public class ViewPagerFragmentAdapter extends FragmentStateAdapter {
 
@@ -20,22 +20,20 @@ public class ViewPagerFragmentAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        switch (position) {
+        return new SongsFragment();
+
+//        switch (position) {
 //            case 0:
-//                return new PlaylistFragment();
-            case 0:
-                return new ArtistsFragment();
-            case 1:
-                return new AlbumsListFragment();
-            default:
-                return new SongsFragment();
+//                return new ArtistsFragment();
+//            case 1:
+//                return new AlbumsListFragment();
 //            default:
-//                return new GenresFragment();
-        }
+//                return new SongsFragment();
+//        }
     }
 
     @Override
     public int getItemCount() {
-        return 3;
+        return 1;
     }
 }

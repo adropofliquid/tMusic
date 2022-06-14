@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.items.AlbumHeaderView;
+import com.adropofliquid.tmusic.uncat.items.AlbumHeaderView;
 import com.bumptech.glide.Glide;
 
 public class AlbumHeaderViewHolder extends RecyclerView.ViewHolder{

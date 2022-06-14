@@ -9,7 +9,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
-import com.adropofliquid.tmusic.sleeptimer.SleepTimer;
+import com.adropofliquid.tmusic.uncat.sleeptimer.SleepTimer;
 
 public class SleepTimerDialog extends DialogFragment {
 

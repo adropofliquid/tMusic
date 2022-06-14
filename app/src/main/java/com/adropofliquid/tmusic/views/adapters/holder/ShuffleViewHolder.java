@@ -8,10 +8,9 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.adropofliquid.tmusic.items.SongItem;
-import com.adropofliquid.tmusic.playfromlist.Play;
+import com.adropofliquid.tmusic.uncat.items.SongItem;
+import com.adropofliquid.tmusic.uncat.playfromlist.Play;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ShuffleViewHolder extends RecyclerView.ViewHolder{

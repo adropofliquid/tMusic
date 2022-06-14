@@ -8,8 +8,8 @@ import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.room.dao.LastPlatedStateDao;
 import com.adropofliquid.tmusic.room.dao.QueueDao;
 import com.adropofliquid.tmusic.room.QueueDb;
-import com.adropofliquid.tmusic.items.LastPlayedStateItem;
-import com.adropofliquid.tmusic.items.SongItem;
+import com.adropofliquid.tmusic.uncat.items.LastPlayedStateItem;
+import com.adropofliquid.tmusic.uncat.items.SongItem;
 
 import java.util.List;
 

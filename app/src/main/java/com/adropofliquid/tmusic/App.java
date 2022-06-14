@@ -4,7 +4,10 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 
+import androidx.core.os.HandlerCompat;
 import androidx.room.Room;
 
 import com.adropofliquid.tmusic.room.QueueDb;
@@ -20,6 +23,8 @@ public class App extends Application {
     QueueDb queueDb;
     SongRoom songRoom;
     ExecutorService executorService;
+    Handler mainThreadHandler;
+
 
     @Override
     public void onCreate() {
@@ -29,7 +34,7 @@ public class App extends Application {
         songRoom = Room.databaseBuilder(this, SongRoom.class, "songs").allowMainThreadQueries().fallbackToDestructiveMigration().build(); //FIXME maybe disallow mainthread queries
 
         executorService = Executors.newFixedThreadPool(4);
-
+        mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());
     }
 
     private void createChannel() {
@@ -60,6 +65,10 @@ public class App extends Application {
 
     public SongRoom getSongRoom(){
         return songRoom;
+    }
+
+    public Handler getMainThreadHandler(){
+        return mainThreadHandler;
     }
 
     @Override

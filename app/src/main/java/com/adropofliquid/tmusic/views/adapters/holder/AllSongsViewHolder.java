@@ -1,20 +1,12 @@
 package com.adropofliquid.tmusic.views.adapters.holder;
 
 import android.app.Activity;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.adropofliquid.tmusic.items.AlbumItem;
-import com.adropofliquid.tmusic.items.SongItem;
-import com.adropofliquid.tmusic.playfromlist.Play;
-import com.adropofliquid.tmusic.views.activity.MainActivity;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.adropofliquid.tmusic.views.MainActivity;
 
 public class AllSongsViewHolder extends RecyclerView.ViewHolder{
 

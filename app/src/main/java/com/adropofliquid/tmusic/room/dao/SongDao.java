@@ -1,13 +1,12 @@
 package com.adropofliquid.tmusic.room.dao;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-import com.adropofliquid.tmusic.items.ShuffleItem;
-import com.adropofliquid.tmusic.items.SongItem;
+import com.adropofliquid.tmusic.uncat.items.ShuffleItem;
+import com.adropofliquid.tmusic.uncat.items.SongItem;
 
 import java.util.List;
 

@@ -5,8 +5,8 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-import com.adropofliquid.tmusic.items.ShuffleItem;
-import com.adropofliquid.tmusic.items.SongItem;
+import com.adropofliquid.tmusic.uncat.items.ShuffleItem;
+import com.adropofliquid.tmusic.uncat.items.SongItem;
 
 import java.util.List;
 

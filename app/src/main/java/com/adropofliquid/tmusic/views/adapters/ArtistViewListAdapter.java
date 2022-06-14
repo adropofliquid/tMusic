@@ -8,11 +8,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.items.AlbumHeaderView;
-import com.adropofliquid.tmusic.items.AlbumItem;
+import com.adropofliquid.tmusic.uncat.items.AlbumHeaderView;
+import com.adropofliquid.tmusic.uncat.items.AlbumItem;
 import com.adropofliquid.tmusic.views.adapters.holder.AlbumHeaderViewHolder;
 import com.adropofliquid.tmusic.views.adapters.holder.AllSongsViewHolder;
-import com.adropofliquid.tmusic.views.fragment.mylibrary.song.SongViewHolder;
+import com.adropofliquid.tmusic.views.mylibrary.song.SongViewHolder;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;

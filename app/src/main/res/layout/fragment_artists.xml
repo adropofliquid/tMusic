@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".views.fragment.mylibrary.artist.ArtistsFragment"
+    tools:context=".views.mylibrary.artist.ArtistsFragment"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:id="@+id/artist_frag">
 

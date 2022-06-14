@@ -18,12 +18,12 @@
             android:theme="@style/Theme.TMusic.NowPlaying"
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboardHidden"
-            android:name=".views.activity.NowPlaying" />
+            android:name=".views.nowplaying.NowPlaying" />
 
         <activity
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboardHidden"
-            android:name=".views.activity.MainActivity">
+            android:name=".views.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

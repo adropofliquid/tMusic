@@ -1,6 +1,5 @@
 package com.adropofliquid.tmusic.views.fragment.main;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.mediastore.LoadMediaData;
-import com.adropofliquid.tmusic.mediastore.LoadMediaStore;
-import com.adropofliquid.tmusic.views.activity.MainActivity;
-import com.adropofliquid.tmusic.views.fragment.mylibrary.song.SongListAdapter;
+import com.adropofliquid.tmusic.uncat.mediastore.LoadMediaData;
 
 
 public class TempSongsFragment extends Fragment {

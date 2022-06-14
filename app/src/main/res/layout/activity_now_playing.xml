@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/font_list_dark"
     android:theme="@style/Theme.TMusic.NowPlaying"
-    tools:context=".views.activity.NowPlaying">
+    tools:context=".views.nowplaying.NowPlaying">
 
     <include layout="@layout/toolbar_player" />
 

@@ -9,7 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.items.SongItem;
+import com.adropofliquid.tmusic.uncat.items.SongItem;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
