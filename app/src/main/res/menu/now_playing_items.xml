@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/sleep_timer"
         android:title="@string/sleep_timer"
@@ -12,5 +13,11 @@
     <item android:id="@+id/toolbar_player_album"
         android:title="@string/album"
         android:orderInCategory="300" />
+
+    <item android:id="@+id/search"
+        android:title="Search"
+        android:icon="@drawable/ic_baseline_search_24"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="android.widget.SearchView" />
 
 </menu>

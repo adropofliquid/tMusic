@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.uncat.mediastore.LoadMediaStore;
+import com.adropofliquid.tmusic.data.mediastore.LoadMediaStore;
 import com.adropofliquid.tmusic.views.MainActivity;
 import com.adropofliquid.tmusic.views.adapters.AlbumViewListAdapter;
 

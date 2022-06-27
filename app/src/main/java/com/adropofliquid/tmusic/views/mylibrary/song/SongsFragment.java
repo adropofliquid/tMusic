@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 
 import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.data.queue.SongRepository;
+import com.adropofliquid.tmusic.data.SongRepository;
 import com.adropofliquid.tmusic.uncat.items.SongItem;
 
 import java.util.ArrayList;

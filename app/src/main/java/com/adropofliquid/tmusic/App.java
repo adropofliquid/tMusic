@@ -30,8 +30,8 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         createChannel();
-        queueDb = Room.databaseBuilder(this, QueueDb.class, "queue").allowMainThreadQueries().fallbackToDestructiveMigration().build();
-        songRoom = Room.databaseBuilder(this, SongRoom.class, "songs").allowMainThreadQueries().fallbackToDestructiveMigration().build(); //FIXME maybe disallow mainthread queries
+        queueDb = Room.databaseBuilder(this, QueueDb.class, "queue").allowMainThreadQueries().fallbackToDestructiveMigration().build();//FIXME maybe disallow mainthread queries
+        songRoom = Room.databaseBuilder(this, SongRoom.class, "songs").fallbackToDestructiveMigration().build();
 
         executorService = Executors.newFixedThreadPool(4);
         mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());

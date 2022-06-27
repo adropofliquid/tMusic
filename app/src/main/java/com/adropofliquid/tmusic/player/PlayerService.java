@@ -202,11 +202,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
             startService(new Intent(PlayerService.this, PlayerService.class));
 
             Message msg = playerHandler.obtainMessage();
-//            msg.obj = extras.getSerializable("song");
             msg.what = PlayerHandler.PLAY_FROM_MEDIA_URI;
             msg.setData(extras);
             playerHandler.sendMessage(msg);
-
         }
 
         @Override

@@ -1,6 +1,7 @@
 package com.adropofliquid.tmusic.views.mylibrary.song;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.ContextMenu;
@@ -15,12 +16,14 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.R;
+import com.adropofliquid.tmusic.data.SongRepository;
 import com.adropofliquid.tmusic.uncat.items.AlbumItem;
 import com.adropofliquid.tmusic.uncat.items.SongItem;
 import com.adropofliquid.tmusic.uncat.playfromlist.Play;
 import com.adropofliquid.tmusic.views.MainActivity;
 import com.bumptech.glide.Glide;
 
+import java.security.SecurityPermission;
 import java.util.List;
 
 public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
@@ -111,16 +114,24 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
 
     private void playSongList(List<SongItem> songList, int adapterPosition) {
 
-        shuffleAndRepeat();
-
-        Play play = new Play(activity, songList, adapterPosition, false);
-
-        play.saveQueue();
-        play.playSelected();
-//        Log.v("Song Album:", songList.get(adapterPosition).getAlbumId()+"");
+        setShuffleAndRepeatNone();
+//        Play play = new Play(activity, songList, adapterPosition, false);
+//        play.playSelected();
+//        play.saveQueue();
+        playFromPosition(adapterPosition);
+        SongRepository songRepository = new SongRepository(activity);
+        songRepository.putRoomSongsInQueue();
     }
 
-    private void shuffleAndRepeat(){
+    private void playFromPosition(int adapterPosition) {
+        Bundle bundle = new Bundle();
+        bundle.putInt("song", adapterPosition);
+
+        MediaControllerCompat.getMediaController(activity).getTransportControls()
+                .playFromMediaId("song", bundle);
+    }
+
+    private void setShuffleAndRepeatNone(){
         MediaControllerCompat.getMediaController(activity).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE);
         MediaControllerCompat.getMediaController(activity).getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_NONE);
     }

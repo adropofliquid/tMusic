@@ -32,11 +32,22 @@ public class MyLibraryFragment extends Fragment {
 
         ViewPager2 viewPager2 = view.findViewById(R.id.viewPager);
         viewPager2.setAdapter(new ViewPagerFragmentAdapter(getActivity()));
-        viewPager2.setOffscreenPageLimit(1);
+        viewPager2.setOffscreenPageLimit(2);
 
         TabLayout tabLayout = getActivity().findViewById(R.id.library_tabs);
+
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(
-                tabLayout, viewPager2, (tab, position) -> tab.setText("SONGS"));
+                tabLayout, viewPager2, (tab, position) -> {
+            switch (position){
+                case 0:{
+                    tab.setText("ALBUMS");
+                    break;}
+                case 1:{
+                    tab.setText("SONGS");
+                    break;}
+            }
+        }
+        );
 
 /*
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(

@@ -1,4 +1,4 @@
-package com.adropofliquid.tmusic.uncat.mediastore;
+package com.adropofliquid.tmusic.data.mediastore;
 
 import android.content.ContentResolver;
 import android.content.Context;

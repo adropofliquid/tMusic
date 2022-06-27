@@ -1,4 +1,4 @@
-package com.adropofliquid.tmusic.views.mylibrary.song;
+package com.adropofliquid.tmusic.views.mylibrary;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.views.adapters.holder.ShuffleViewHolder;
 import com.adropofliquid.tmusic.uncat.items.SongItem;
+import com.adropofliquid.tmusic.views.mylibrary.song.SongViewHolder;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;

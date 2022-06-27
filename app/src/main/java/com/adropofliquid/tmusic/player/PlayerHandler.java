@@ -12,10 +12,13 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
+import com.adropofliquid.tmusic.App;
+import com.adropofliquid.tmusic.data.SongRepository;
 import com.adropofliquid.tmusic.uncat.items.SongItem;
 import com.adropofliquid.tmusic.data.queue.Queue;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
 
 
 public class PlayerHandler extends Handler {
@@ -38,6 +41,7 @@ public class PlayerHandler extends Handler {
     private static final String TAG = "Player Handler";
     private final Context context;
     private final Queue queue;
+    private final SongRepository songRepository;
     private MediaPlayer mediaPlayer;
     private final MediaSessionCompat mediaSession;
 
@@ -45,6 +49,8 @@ public class PlayerHandler extends Handler {
         super(looper);
         this.context = context;
         this.queue = new Queue(context);
+        Executor executor = ((App)context).getExecutor();
+        this.songRepository = new SongRepository(executor);
         this.mediaSession = mediaSession;
 
         setNewState(PlaybackStateCompat.STATE_NONE,0);
@@ -127,11 +133,15 @@ public class PlayerHandler extends Handler {
     }
 
     private void onPlayFromMediaId(Bundle bundle) {
-//FIXME check if dis speeds anytin        stopPlaybackStateUpdate();
+//FIXME check if dis speeds anytin
+// stopPlaybackStateUpdate();
 
         setNewState(PlaybackStateCompat.STATE_PLAYING, 0);
+        SongItem song = songRepository.getSong(context, bundle.getInt("song"));
 
-        queue.setCurrentSong((SongItem) bundle.getSerializable("song"));
+        queue.setCurrentSong(song);
+
+//        queue.setCurrentSong((SongItem) bundle.getSerializable("song"));
         mediaSession.getController().getTransportControls().play();
     }
 

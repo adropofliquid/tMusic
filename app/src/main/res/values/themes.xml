@@ -57,7 +57,7 @@
         <item name="android:background">@drawable/more_background</item>
     </style>
     <style name="SongCardMore" parent="Widget.AppCompat.ImageButton">
-        <item name="android:src">@drawable/ic_baseline_more_vert_24</item>
+        <item name="android:src">@drawable/ic_baseline_more_vert_24_dark</item>
         <item name="android:background">@color/card_song_bg</item>
         <item name="android:foreground">?attr/selectableItemBackgroundBorderless</item>
     </style>

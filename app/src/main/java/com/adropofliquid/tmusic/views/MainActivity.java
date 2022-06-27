@@ -24,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.adropofliquid.tmusic.App;
+import com.adropofliquid.tmusic.data.SongRepository;
 import com.adropofliquid.tmusic.uncat.permissions.SystemPermissions;
 import com.adropofliquid.tmusic.views.mylibrary.artist_view.ArtistViewFragment;
 import com.adropofliquid.tmusic.views.mylibrary.MyLibraryFragment;
@@ -37,6 +39,8 @@ import com.adropofliquid.tmusic.views.mylibrary.album_songs.AlbumSongsListFragme
 import com.adropofliquid.tmusic.views.nowplaying.NowPlaying;
 import com.bumptech.glide.Glide;
 import com.google.android.material.tabs.TabLayout;
+
+import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -62,6 +66,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+/*
+        TODO dis needs to be done to load song into cache
+
+        Executor executor = ((App)getApplicationContext()).getExecutor();
+        SongRepository songRepository = new SongRepository(executor);
+        songRepository.updateCache(this);*/
+
 
 
         loadMusicPlayer(savedInstanceState);

@@ -1,4 +1,4 @@
-package com.adropofliquid.tmusic.uncat.mediastore;
+package com.adropofliquid.tmusic.data.mediastore;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -10,7 +10,7 @@ import com.adropofliquid.tmusic.views.adapters.AlbumViewListAdapter;
 import com.adropofliquid.tmusic.views.adapters.ArtistViewListAdapter;
 import com.adropofliquid.tmusic.views.mylibrary.album.AlbumsListAdapter;
 import com.adropofliquid.tmusic.views.mylibrary.artist.ArtistsAdapter;
-import com.adropofliquid.tmusic.views.mylibrary.song.SongListAdapter;
+import com.adropofliquid.tmusic.views.mylibrary.SongListAdapter;
 
 public class LoadMediaData extends AsyncTask<String, Void, String> {
 

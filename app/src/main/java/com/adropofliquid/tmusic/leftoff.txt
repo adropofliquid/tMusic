@@ -10,4 +10,11 @@ so can cancel on multiple press
 // so now we can shuffle anyhow we want
 // or whatever really
 
-//FIXME maybe disallow mainthread queries
+
+Map
+Load to room
+SongView
+    remove unnecessary options in 3 dots
+do search view
+onClick songs, do engineering
+check ish with nowPlaying

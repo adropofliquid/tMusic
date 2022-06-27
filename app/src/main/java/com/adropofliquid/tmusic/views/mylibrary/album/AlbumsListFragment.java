@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.uncat.mediastore.LoadMediaData;
+import com.adropofliquid.tmusic.data.mediastore.LoadMediaData;
 
 public class AlbumsListFragment extends Fragment {
 
