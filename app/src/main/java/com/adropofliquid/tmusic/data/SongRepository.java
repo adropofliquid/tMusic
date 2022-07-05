@@ -16,6 +16,7 @@ import com.adropofliquid.tmusic.uncat.items.SongItem;
 import com.adropofliquid.tmusic.data.mediastore.LoadMediaStore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -23,6 +24,8 @@ public class SongRepository {
 
     private static final String TAG = "Song Repository: ";
     private final Executor executor;
+    private Context context;
+    private SongRoom songRoom;
 
     public SongRepository(Executor executor){
         this.executor = executor;
@@ -30,6 +33,8 @@ public class SongRepository {
 
     public SongRepository(Context context){
         this.executor =  ((App)context.getApplicationContext()).getExecutor();
+        this.context = context;
+        this.songRoom = ((App)context.getApplicationContext()).getSongRoom();
     }
 
     public void loadSongs(Context context, OnSongsLoadedCallback onSongsLoadedCallback) {
@@ -44,6 +49,28 @@ public class SongRepository {
         });
     }
 
+    public void loadShuffledSongs(Context context, OnSongsShuffledCallback onSongsShuffledCallback) {
+        executor.execute(()->{
+            List<SongItem> songs = getCachedSongs(context);
+            List<Integer> shuffledPlayOrder = shuffledPlayOrder(songs.size());
+
+            for(int i = 0; i < shuffledPlayOrder.size(); i++){
+                songs.get(i).setPlayOrder(shuffledPlayOrder.get(i));
+            }
+
+            onSongsShuffledCallback.onShuffled(songs.get(1));
+            cacheSongs(context,songs, getCacheVersion(context));
+        });
+    }
+
+    private List<Integer> shuffledPlayOrder(int size){
+        List<Integer> playOrder = new ArrayList<>();
+        for(int i = 0; i < size; i++){
+            playOrder.add(i);
+        }
+        Collections.shuffle(playOrder);
+        return playOrder;
+    }
 
     public void updateCache(Context context, OnSongsLoadedCallback onSongsLoadedCallback) {
         executor.execute(() -> {
@@ -57,7 +84,6 @@ public class SongRepository {
     }
 
     private void clearCache(Context context) {
-        updateCacheVersion(String.valueOf(0), context);
 
         SongRoom songRoom = ((App)context.getApplicationContext()).getSongRoom();
         SongDao songDao = songRoom.songDao();
@@ -66,10 +92,12 @@ public class SongRepository {
             songDao.deleteAll();
             Log.d(TAG, "Cache cleared: ");
         });
+
+        updateCacheVersion(String.valueOf(0), context);
+
     }
 
     private void cacheSongs(Context context, List<SongItem> songs, String cacheVersion) {
-        updateCacheVersion(cacheVersion, context);
 
         SongRoom songRoom = ((App)context.getApplicationContext()).getSongRoom();
         SongDao songDao = songRoom.songDao();
@@ -80,6 +108,9 @@ public class SongRepository {
             Log.d(TAG, "Songs cached: " + songs.size());
 
         });
+
+        updateCacheVersion(cacheVersion, context);
+
     }
 
     private void updateCacheVersion(String version, Context context) {
@@ -174,8 +205,21 @@ public class SongRepository {
         return songDao.findById(position);
     }
 
+    public int count() {
+        SongDao songDao = songRoom.songDao();
+        return songDao.count();
+    }
+
+    public SongItem getSongById(int currentSongId) {
+        return songRoom.songDao().findById(currentSongId);
+    }
+
     public interface OnSongsLoadedCallback{
         void onLoaded(List<SongItem> songs);
+    }
+
+    public interface OnSongsShuffledCallback{
+        void onShuffled(SongItem song);
     }
 
 }

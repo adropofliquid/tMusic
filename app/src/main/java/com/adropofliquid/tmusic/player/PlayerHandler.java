@@ -18,6 +18,7 @@ import com.adropofliquid.tmusic.uncat.items.SongItem;
 import com.adropofliquid.tmusic.data.queue.Queue;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 
@@ -49,8 +50,8 @@ public class PlayerHandler extends Handler {
         super(looper);
         this.context = context;
         this.queue = new Queue(context);
-        Executor executor = ((App)context).getExecutor();
-        this.songRepository = new SongRepository(executor);
+        this.songRepository = new SongRepository(context);
+        this.queue.setSongRepository(songRepository);
         this.mediaSession = mediaSession;
 
         setNewState(PlaybackStateCompat.STATE_NONE,0);
@@ -104,14 +105,11 @@ public class PlayerHandler extends Handler {
                 moveUpQueue();
                 break;
             case SHUFFLE_PLAYQUEUE:
-                shuffleQueue();
+                shuffleQueue(msg.what);
                 break;
         }
 
     }
-
-
-
 
     @SuppressLint("WrongConstant")
     private void prepareLastPlayed(){
@@ -133,15 +131,11 @@ public class PlayerHandler extends Handler {
     }
 
     private void onPlayFromMediaId(Bundle bundle) {
-//FIXME check if dis speeds anytin
-// stopPlaybackStateUpdate();
-
+        //FIXME speeds anytin??
+        // stopPlaybackStateUpdate();
         setNewState(PlaybackStateCompat.STATE_PLAYING, 0);
         SongItem song = songRepository.getSong(context, bundle.getInt("song"));
-
         queue.setCurrentSong(song);
-
-//        queue.setCurrentSong((SongItem) bundle.getSerializable("song"));
         mediaSession.getController().getTransportControls().play();
     }
 
@@ -181,14 +175,12 @@ public class PlayerHandler extends Handler {
     }
 
     private void onSkipToNext() {
-
         if(mediaSession.getController().getRepeatMode() == PlaybackStateCompat.REPEAT_MODE_ONE){
             repeatSong();
         }
         else{
             playNextOrRepeatAll();
         }
-
     }
 
     private void playNextOrRepeatAll(){
@@ -200,18 +192,14 @@ public class PlayerHandler extends Handler {
                 repeatAll();
         }
         else{
-            if(queue.hasNext()) {
-                playNext();
+            if(queue.hasNext(isSessionShuffling())) {
+                moveDownQueue();
+                onPlay();
             }
             else {
                 repeatAll();
             }
         }
-    }
-
-    private void playNext(){
-        moveDownQueue();
-        onPlay();
     }
 
     private void repeatSong(){
@@ -235,7 +223,7 @@ public class PlayerHandler extends Handler {
                 onSkipToQueueItem(queue.getCurrentSong().getPlayOrder() - 1);
         }
         else {
-            if(queue.hasPrev()){
+            if(queue.hasPrev(isSessionShuffling())){
                 moveUpQueue();
                 onPlay();
             }
@@ -258,17 +246,14 @@ public class PlayerHandler extends Handler {
         setNewState(PlaybackStateCompat.STATE_PLAYING, 0);
 
         if(isSessionShuffling()){
-            queue.setCurrentSongWithPlayOrder(id);
+//            queue.setCurrentSongWithPlayOrder(id);
+            queue.setCurrentSong(songRepository.getSong(context,id));
         }
         else{
             //FIXME abi na TODO error of music not found
             queue.setCurrentSongWithId(id);
         }
-
         mediaSession.getController().getTransportControls().play();
-
-
-
     }
 
     private void onPlayFromLast(int id) {
@@ -397,8 +382,12 @@ public class PlayerHandler extends Handler {
     }
 
     private void moveDownQueue() { //could change to making queue Class do it
-        if(queue.hasNext()){
-            queue.setCurrentSongWithId(queue.getCurrentSong().getId() + 1);
+        if(queue.hasNext(isSessionShuffling())){
+            if(isSessionShuffling())
+                queue.setCurrentSongWithId(queue.getCurrentSong().getPlayOrder() + 1);
+            else
+                queue.setCurrentSongWithId(queue.getCurrentSong().getId() + 1);
+
             queue.saveLastPlayedState(0,
                     isSessionShuffling(),
                     mediaSession.getController().getRepeatMode());
@@ -411,8 +400,12 @@ public class PlayerHandler extends Handler {
     }
 
     private void moveUpQueue() {
-        if(queue.hasPrev()){
-            queue.setCurrentSongWithId(queue.getCurrentSong().getId() - 1);
+        if(queue.hasPrev(isSessionShuffling())){
+            if(isSessionShuffling())
+                queue.setCurrentSongWithId(queue.getCurrentSong().getPlayOrder() - 1);
+            else
+                queue.setCurrentSongWithId(queue.getCurrentSong().getId() - 1);
+
             queue.saveLastPlayedState(0,
                     isSessionShuffling(),
                     mediaSession.getController().getRepeatMode());
@@ -423,7 +416,11 @@ public class PlayerHandler extends Handler {
         stopPlaybackStateUpdate();
     }
 
-    private void shuffleQueue() {
-
+    private void shuffleQueue(int what) {
+//        mediaSession.setShuffleMode(what);
+        Log.d("TAG ","Song shuffle: set to "+ what);
+//        if(what == PlaybackStateCompat.SHUFFLE_MODE_GROUP)
+            //TODO shufffle was from nowPlaying view so tell repo to shuffle
     }
+
 }

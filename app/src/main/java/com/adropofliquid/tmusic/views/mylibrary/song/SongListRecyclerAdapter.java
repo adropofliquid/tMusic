@@ -33,9 +33,9 @@ public class SongListRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == SongItem.TYPE_SHUFFLE) {
-            return new SongListShuffleViewHolder(
+            return new SongListShuffleViewHolder(activity,
                     LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.card_song_shuffle, parent, false), songList);
+                            .inflate(R.layout.card_song_shuffle, parent, false));
         }
         return new SongViewHolder(activity,
                 LayoutInflater.from(parent.getContext())

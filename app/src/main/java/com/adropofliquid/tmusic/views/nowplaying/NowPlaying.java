@@ -23,6 +23,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.adropofliquid.tmusic.R;
+import com.adropofliquid.tmusic.data.queue.QueueBck;
 import com.adropofliquid.tmusic.views.adapters.NowPlayingAdapter;
 import com.adropofliquid.tmusic.room.model.LastPlayedStateItem;
 import com.adropofliquid.tmusic.player.PlayerService;
@@ -197,12 +198,12 @@ private static final String TAG = "NowPlaying: ";
     private  class LoadSongs extends AsyncTask<String, Void, String> {
 
         private LastPlayedStateItem last;
-        private Queue queue;
+        private QueueBck queue;
 
         @Override
         protected String doInBackground(String... strings) {
 
-            queue = new Queue(NowPlaying.this);
+            queue = new QueueBck(NowPlaying.this);
             queue.loadLastPlayedState();
 
             last = queue.getLastPlayedState();

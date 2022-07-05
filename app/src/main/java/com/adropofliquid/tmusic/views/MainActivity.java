@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.adropofliquid.tmusic.data.queue.QueueBck;
 import com.adropofliquid.tmusic.uncat.permissions.SystemPermissions;
 import com.adropofliquid.tmusic.views.mylibrary.artist_view.ArtistViewFragment;
 import com.adropofliquid.tmusic.views.mylibrary.MyLibraryFragment;
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void buildTransportControls() {
 
-        new LoadLastPlayed().execute();
+        //FIXME get last played new LoadLastPlayed().execute();
 
         mediaController.registerCallback(controllerCallback); //stay in sync
     }
@@ -162,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
 
-            Queue queue = new Queue(MainActivity.this);
+            QueueBck queue = new QueueBck(MainActivity.this);
             queue.loadLastPlayedState();
             last = queue.getLastPlayedState();
             if(last != null)

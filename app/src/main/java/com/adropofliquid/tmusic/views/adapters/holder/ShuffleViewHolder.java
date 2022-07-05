@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.uncat.items.SongItem;
-import com.adropofliquid.tmusic.uncat.playfromlist.Play;
 
 import java.util.List;
 
@@ -24,19 +23,19 @@ public class ShuffleViewHolder extends RecyclerView.ViewHolder{
     }
     private void shuffleAllSongs(Activity activity, List<SongItem> songList) {
 
-        MediaControllerCompat.getMediaController(activity).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_ALL);
-
-        Play play = new Play(activity,
-                songList,
-                0,
-                true);
-
-        play.saveQueue();
-
-        play.registerOnShuffledCallback(firstOnList -> {
-            play.setSongPosition(firstOnList);
-            play.playSelected();
-        });
+//        MediaControllerCompat.getMediaController(activity).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_ALL);
+//
+//        Play play = new Play(activity,
+//                songList,
+//                0,
+//                true);
+//
+//        play.saveQueue();
+//
+//        play.registerOnShuffledCallback(firstOnList -> {
+//            play.setSongPosition(firstOnList);
+//            play.playSelected();
+//        });
 
     }
 

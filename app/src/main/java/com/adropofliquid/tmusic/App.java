@@ -10,6 +10,7 @@ import android.os.Looper;
 import androidx.core.os.HandlerCompat;
 import androidx.room.Room;
 
+import com.adropofliquid.tmusic.data.SongRepository;
 import com.adropofliquid.tmusic.room.QueueDb;
 import com.adropofliquid.tmusic.room.SongRoom;
 
@@ -32,7 +33,6 @@ public class App extends Application {
         createChannel();
         queueDb = Room.databaseBuilder(this, QueueDb.class, "queue").allowMainThreadQueries().fallbackToDestructiveMigration().build();//FIXME maybe disallow mainthread queries
         songRoom = Room.databaseBuilder(this, SongRoom.class, "songs").fallbackToDestructiveMigration().build();
-
         executorService = Executors.newFixedThreadPool(4);
         mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());
     }

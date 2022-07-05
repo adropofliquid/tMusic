@@ -220,7 +220,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         @Override
         public void onCustomAction(String action, Bundle extras) {
-
             switch (action) {
                 case "PauseUpdate": //From the Now Playing activity
                     tellPlayerTo(PlayerHandler.STOP_PLAYBACKSTATE_UPDATE);
@@ -270,8 +269,8 @@ public class PlayerService extends MediaBrowserServiceCompat {
             }
 
             mediaSession.setShuffleMode(shuffleMode)*/;
+//            tellPlayerTo(PlayerHandler.SHUFFLE_PLAYQUEUE, shuffleMode);
             mediaSession.setShuffleMode(shuffleMode);
-            tellPlayerTo(PlayerHandler.SHUFFLE_PLAYQUEUE);
         }
 
         @Override
