@@ -9,7 +9,9 @@ import android.util.Log;
 
 import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.room.SongRoom;
+import com.adropofliquid.tmusic.room.dao.CacheVersionDao;
 import com.adropofliquid.tmusic.room.dao.SongDao;
+import com.adropofliquid.tmusic.room.model.CacheVersionItem;
 import com.adropofliquid.tmusic.uncat.items.SongItem;
 import com.adropofliquid.tmusic.data.mediastore.LoadMediaStore;
 
@@ -33,28 +35,41 @@ public class SongRepository {
     public void loadSongs(Context context, OnSongsLoadedCallback onSongsLoadedCallback) {
         executor.execute(()->{
             List<SongItem> songs;
-            if(!songCacheIsLatest()) {
-                songs = new LoadMediaStore(context).getAllSongs();
-                onSongsLoadedCallback.onLoaded(songs);
-                cacheSongs(context,songs);
-            }
-            else {
+
                 songs = getCachedSongs(context);
                 Log.d(TAG, "Songs loaded from cache: " + songs.size());
                 onSongsLoadedCallback.onLoaded(songs);
-            }
+                if(!getCacheVersion(context).equals(MediaStore.getVersion(context)))
+                    updateCache(context, onSongsLoadedCallback);
         });
     }
 
-    public void updateCache(Context context) {
+
+    public void updateCache(Context context, OnSongsLoadedCallback onSongsLoadedCallback) {
         executor.execute(() -> {
             List<SongItem> mediaStoreSongs = getAllSongsFromMediaStore(context);
             if(!mediaStoreSongs.isEmpty())
-                cacheSongs(context,mediaStoreSongs);
+                cacheSongs(context,mediaStoreSongs, MediaStore.getVersion(context));
+            else
+                clearCache(context);
+            loadSongs(context, onSongsLoadedCallback); // to update whoever initiated dis
         });
     }
 
-    private void cacheSongs(Context context, List<SongItem> songs) {
+    private void clearCache(Context context) {
+        updateCacheVersion(String.valueOf(0), context);
+
+        SongRoom songRoom = ((App)context.getApplicationContext()).getSongRoom();
+        SongDao songDao = songRoom.songDao();
+
+        songRoom.runInTransaction(() -> {
+            songDao.deleteAll();
+            Log.d(TAG, "Cache cleared: ");
+        });
+    }
+
+    private void cacheSongs(Context context, List<SongItem> songs, String cacheVersion) {
+        updateCacheVersion(cacheVersion, context);
 
         SongRoom songRoom = ((App)context.getApplicationContext()).getSongRoom();
         SongDao songDao = songRoom.songDao();
@@ -67,10 +82,27 @@ public class SongRepository {
         });
     }
 
-    private boolean songCacheIsLatest() {
-        //TODO check if the cache has current song already
-        // return false jus for testing
-        return true;
+    private void updateCacheVersion(String version, Context context) {
+        CacheVersionItem cacheVersionItem = new CacheVersionItem();
+        cacheVersionItem.setCacheVersion(version);
+        cacheVersionItem.setId(1);
+
+        SongRoom songRoom = ((App)context.getApplicationContext()).getSongRoom();
+        CacheVersionDao cacheVersionDao = songRoom.cacheVersionDao();
+
+        songRoom.runInTransaction(() -> {
+            cacheVersionDao.delete();
+            cacheVersionDao.insertAll(cacheVersionItem);
+        });
+
+    }
+
+    private String getCacheVersion(Context context){
+
+        SongRoom songRoom = ((App)context.getApplicationContext()).getSongRoom();
+        CacheVersionDao cacheVersionDao = songRoom.cacheVersionDao();
+
+        return cacheVersionDao.getCacheVersion() == null ? String.valueOf(0) : cacheVersionDao.getCacheVersion().getCacheVersion();
     }
 
     private List<SongItem> getCachedSongs(Context context) {
@@ -78,13 +110,6 @@ public class SongRepository {
         SongRoom songRoom = ((App)context.getApplicationContext()).getSongRoom();
         SongDao songDao = songRoom.songDao();
         return songDao.getAll();
-    }
-
-    private void loadMediaStoreToSongRoom(Context context){
-        if(!songCacheIsLatest()) {
-            List<SongItem> mediaStoreSongs = getAllSongsFromMediaStore(context);
-            List<SongItem> cacheSongs = getCachedSongs(context);
-        }
     }
 
     private List<SongItem> getAllSongsFromMediaStore(Context context){
@@ -147,10 +172,6 @@ public class SongRepository {
         SongRoom songRoom = ((App)context.getApplicationContext()).getSongRoom();
         SongDao songDao = songRoom.songDao();
         return songDao.findById(position);
-    }
-
-    public void putRoomSongsInQueue() {
-
     }
 
     public interface OnSongsLoadedCallback{

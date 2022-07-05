@@ -1,4 +1,4 @@
-package com.adropofliquid.tmusic.uncat.items;
+package com.adropofliquid.tmusic.room.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;

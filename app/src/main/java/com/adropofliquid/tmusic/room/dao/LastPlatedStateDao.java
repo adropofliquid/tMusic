@@ -4,7 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-import com.adropofliquid.tmusic.uncat.items.LastPlayedStateItem;
+import com.adropofliquid.tmusic.room.model.LastPlayedStateItem;
 
 @Dao
 public interface LastPlatedStateDao {

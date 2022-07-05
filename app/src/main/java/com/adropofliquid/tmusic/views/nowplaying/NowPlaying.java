@@ -24,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.views.adapters.NowPlayingAdapter;
-import com.adropofliquid.tmusic.uncat.items.LastPlayedStateItem;
+import com.adropofliquid.tmusic.room.model.LastPlayedStateItem;
 import com.adropofliquid.tmusic.player.PlayerService;
 import com.adropofliquid.tmusic.data.queue.Queue;
 import com.adropofliquid.tmusic.views.dialog.SleepTimerDialog;

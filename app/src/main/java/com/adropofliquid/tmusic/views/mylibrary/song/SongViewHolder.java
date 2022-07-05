@@ -120,7 +120,7 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCr
 //        play.saveQueue();
         playFromPosition(adapterPosition);
         SongRepository songRepository = new SongRepository(activity);
-        songRepository.putRoomSongsInQueue();
+//        songRepository.putRoomSongsInQueue();
     }
 
     private void playFromPosition(int adapterPosition) {
