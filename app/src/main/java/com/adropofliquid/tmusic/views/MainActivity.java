@@ -24,7 +24,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.adropofliquid.tmusic.data.queue.QueueBck;
+import com.adropofliquid.tmusic.data.SongRepository;
 import com.adropofliquid.tmusic.uncat.permissions.SystemPermissions;
 import com.adropofliquid.tmusic.views.mylibrary.artist_view.ArtistViewFragment;
 import com.adropofliquid.tmusic.views.mylibrary.MyLibraryFragment;
@@ -32,7 +32,6 @@ import com.adropofliquid.tmusic.R;
 import com.adropofliquid.tmusic.room.model.LastPlayedStateItem;
 import com.adropofliquid.tmusic.uncat.items.SongItem;
 import com.adropofliquid.tmusic.player.PlayerService;
-import com.adropofliquid.tmusic.data.queue.Queue;
 import com.adropofliquid.tmusic.views.fragment.main.TempSongsFragment;
 import com.adropofliquid.tmusic.views.mylibrary.album_songs.AlbumSongsListFragment;
 import com.adropofliquid.tmusic.views.nowplaying.NowPlaying;
@@ -151,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void buildTransportControls() {
 
-        //FIXME get last played new LoadLastPlayed().execute();
+        new LoadLastPlayed().execute();
 
         mediaController.registerCallback(controllerCallback); //stay in sync
     }
@@ -163,17 +162,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
 
-            QueueBck queue = new QueueBck(MainActivity.this);
-            queue.loadLastPlayedState();
-            last = queue.getLastPlayedState();
+            SongRepository songRepository = new SongRepository(MainActivity.this);
+
+            last = songRepository.getLastPlayedState();
             if(last != null)
-                lastSong = queue.getSong(last.getId());
+                lastSong = songRepository.getSongById(last.getId());
 
             return "Executed";
         }
         @Override
         protected void onPostExecute(String result) {
-
             if(last != null){
                 enableBottomButtons = true;
                 Glide.with(MainActivity.this)

@@ -8,8 +8,8 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -22,13 +22,18 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.R;
-import com.adropofliquid.tmusic.data.queue.QueueBck;
-import com.adropofliquid.tmusic.views.adapters.NowPlayingAdapter;
+import com.adropofliquid.tmusic.data.SongRepository;
+import com.adropofliquid.tmusic.uncat.items.SongItem;
 import com.adropofliquid.tmusic.room.model.LastPlayedStateItem;
 import com.adropofliquid.tmusic.player.PlayerService;
-import com.adropofliquid.tmusic.data.queue.Queue;
 import com.adropofliquid.tmusic.views.dialog.SleepTimerDialog;
+import com.adropofliquid.tmusic.views.mylibrary.song.AdapterSpawn;
+
+import java.util.List;
+import java.util.concurrent.Executor;
 
 
 public class NowPlaying extends AppCompatActivity implements View.OnCreateContextMenuListener{
@@ -36,7 +41,6 @@ public class NowPlaying extends AppCompatActivity implements View.OnCreateContex
 
 private static final String TAG = "NowPlaying: ";
     private ViewPager2 viewPager2;
-    private RecyclerView.Adapter adapter;
     private SeekBar seekBar;
     private TextView durationStart,durationEnd;
     private ImageView playerPrev, playerPlay, playerNext, playerShuffle, playerRepeat;
@@ -57,6 +61,7 @@ private static final String TAG = "NowPlaying: ";
                 null);
 
         viewPager2 = findViewById(R.id.viewPager);
+        viewPager2.setUserInputEnabled(false); //TODO enable to swipe to next/previous songs
         playerPrev = findViewById(R.id.previous);
         playerPlay = findViewById(R.id.play);
         playerNext = findViewById(R.id.next);
@@ -157,7 +162,9 @@ private static final String TAG = "NowPlaying: ";
         changeRepeatButtons();
         changeShuffleButton();
 
-        new LoadSongs().execute();
+        nowPlayingViews();
+        //new LoadSongs().execute();
+
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
@@ -195,43 +202,50 @@ private static final String TAG = "NowPlaying: ";
         mediaController.registerCallback(controllerCallback);
     }
 
-    private  class LoadSongs extends AsyncTask<String, Void, String> {
+    private void nowPlayingViews() {
+        Executor executor = ((App) getApplicationContext()).getExecutor();
 
-        private LastPlayedStateItem last;
-        private QueueBck queue;
+        SongRepository songRepository = new SongRepository(this);
 
-        @Override
-        protected String doInBackground(String... strings) {
-
-            queue = new QueueBck(NowPlaying.this);
-            queue.loadLastPlayedState();
-
-            last = queue.getLastPlayedState();
-            queue.setCurrentSongWithId(last.getId());
-
-            adapter = new NowPlayingAdapter(NowPlaying.this,queue.getQueue());
-            return "Executed";
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            if (last != null){
-                viewPager2.setAdapter(adapter);
-                viewPager2.setCurrentItem(queue.getCurrentSong().getId(), false);
-
-                seekBar.setMax(queue.getCurrentSong().getDuration());
-                seekBar.setProgress((int) queue.getLastPlayedState().getTimePlayed());
-
-                durationStart.setText(durationFormat((int) last.getTimePlayed()));
-                durationEnd.setText(durationFormat(queue.getCurrentSong().getDuration()));
-
-                currentSongPosition = last.getId();
-            }
-        }
-        @Override
-        protected void onPreExecute() {
-        }
+        if(mediaController.getShuffleMode() == PlaybackStateCompat.SHUFFLE_MODE_NONE)
+            songRepository.loadSongs((songs)->spawnAdapter(songs,executor));
+        else
+            songRepository.loadCacheSongsPlayOrder((songs)->spawnAdapter(songs,executor)); //FIXME data doesn't match what is playing
     }
 
+    private void spawnAdapter(List<SongItem> songs, Executor executor) {
+        AdapterSpawn adapterSpawn = new AdapterSpawn(executor);
+        adapterSpawn.spawnNowPlayingAdapter(this,songs, this::putAdapterOnMainThread);
+    }
+
+    private void putAdapterOnMainThread(RecyclerView.Adapter adapter){
+        Handler mainThreadHandler = ((App) getApplicationContext()).getMainThreadHandler();
+        mainThreadHandler.post(() -> viewPager2.setAdapter(adapter));
+        SongRepository songRepository = new SongRepository(this);
+        songRepository.loadLastState((last, song) -> loadLastPlayed(last, song));
+    }
+
+    private void loadLastPlayed(LastPlayedStateItem last, SongItem song){
+        Handler mainThreadHandler = ((App) getApplicationContext()).getMainThreadHandler();
+        mainThreadHandler.post(() -> {
+
+            Log.d("TAG", "Song details "+ song.getTitle());
+//                RecyclerView.Adapter adapter; //FIXME what if adapter doesn't exist yet
+//                viewPager2.setAdapter(adapter);
+            if(mediaController.getShuffleMode() == PlaybackStateCompat.SHUFFLE_MODE_NONE)
+                viewPager2.setCurrentItem(song.getId(), false);
+            else
+                viewPager2.setCurrentItem(song.getPlayOrder(), false);
+            seekBar.setMax(song.getDuration());
+            seekBar.setProgress((int) last.getTimePlayed());
+
+            durationStart.setText(durationFormat((int) last.getTimePlayed()));
+            durationEnd.setText(durationFormat(song.getDuration()));
+
+            currentSongPosition = last.getId();
+        });
+
+    }
     private void changePausePlayButton(){
         if((mediaController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING))
             playerPlay.setImageResource(R.drawable.widget_pause_normal);
@@ -270,7 +284,7 @@ private static final String TAG = "NowPlaying: ";
                         mediaController.getTransportControls().seekTo(0);
                     }
                     else{
-                        viewPager2.setCurrentItem(viewPager2.getCurrentItem()-1);
+//                        viewPager2.setCurrentItem(viewPager2.getCurrentItem()-1);
                         mediaController.getTransportControls().skipToPrevious();
                     }
                     break;
@@ -281,7 +295,7 @@ private static final String TAG = "NowPlaying: ";
                         mediaController.getTransportControls().pause();
                     break;
                 case R.id.next:
-                    viewPager2.setCurrentItem(viewPager2.getCurrentItem()+1);
+//                    viewPager2.setCurrentItem(viewPager2.getCurrentItem()+1);
                     mediaController.getTransportControls().skipToNext();
                     break;
                 case R.id.shuffle:
@@ -339,7 +353,6 @@ private static final String TAG = "NowPlaying: ";
         return finalTimerString;
     }
 
-
     @Override
     public void onStart() {
         super.onStart();
@@ -366,7 +379,6 @@ private static final String TAG = "NowPlaying: ";
         super.onDestroy();
         stopService(new Intent(this,PlayerService.class));
     }
-
 
     public void showPopup(View v) {
         PopupMenu popup = new PopupMenu(this, v);

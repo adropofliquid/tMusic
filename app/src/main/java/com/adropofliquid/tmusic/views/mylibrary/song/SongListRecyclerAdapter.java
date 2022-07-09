@@ -13,14 +13,15 @@ import com.adropofliquid.tmusic.views.adapters.holder.ShuffleViewHolder;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SongListRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements FastScrollRecyclerView.SectionedAdapter{
     private Activity activity;
     private static final String TAG = "SongList Adapter: ";
-    private ArrayList<SongItem> viewSongList;
-    private ArrayList<SongItem> songList;
+    private List<SongItem> viewSongList;
+    private List<SongItem> songList;
 
-    public SongListRecyclerAdapter(Activity activity, ArrayList<SongItem> songList){
+    public SongListRecyclerAdapter(Activity activity, List<SongItem> songList){
 
         this.activity = activity;
         this.songList = songList;

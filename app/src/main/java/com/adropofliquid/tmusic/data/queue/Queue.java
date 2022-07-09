@@ -1,29 +1,20 @@
 package com.adropofliquid.tmusic.data.queue;
 
-import android.content.Context;
-import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.data.SongRepository;
-import com.adropofliquid.tmusic.room.dao.LastPlatedStateDao;
 import com.adropofliquid.tmusic.room.model.LastPlayedStateItem;
 import com.adropofliquid.tmusic.uncat.items.SongItem;
 
-import java.util.List;
 
 public class Queue {
 
-    private final LastPlatedStateDao lastPlatedStateDao;
     private SongItem currentSong;
     private LastPlayedStateItem lastPlayedStateItem;
+    private final SongRepository songRepository;
 
-    private SongRepository songRepository;
-
-    public Queue(Context context){
-        this.lastPlatedStateDao = ((App)context.getApplicationContext()).getQueueDb().lastPlatedStateDao();
-    }
-
-    public void setSongRepository(SongRepository songRepository){
+    public Queue(SongRepository songRepository){
         this.songRepository = songRepository;
     }
+
     public void setCurrentSongWithId(int currentSongId) {
         currentSong = songRepository.getSongById(currentSongId);
     }
@@ -32,10 +23,7 @@ public class Queue {
         return currentSong;
     }
 
-    public boolean hasNext(boolean isShuffling){
-        if(isShuffling)
-            return hasNextOnPlayOrder();
-        else
+    public boolean hasNext(){
             return currentSong.getId() + 1 < songRepository.count();
     }
 
@@ -43,11 +31,8 @@ public class Queue {
         return currentSong.getPlayOrder() + 1 < songRepository.count();
     }
 
-    public boolean hasPrev(boolean isShuffling){
-        if(isShuffling)
-            return hasPrevOnPlayOrder();
-        else
-            return currentSong.getId() != 0;
+    public boolean hasPrev(){
+        return currentSong.getId() != 0;
     }
 
     public boolean hasPrevOnPlayOrder(){
@@ -59,12 +44,11 @@ public class Queue {
                 currentSong.getId(), currentSong.getSongId(),
                 timePlayed, getShuffled, getRepeat);
 
-            lastPlatedStateDao.delete();
-            lastPlatedStateDao.insertAll(lastPlayedStateItem);
+        songRepository.saveLastPlayedState(lastPlayedStateItem);
     }
 
     public void loadLastPlayedState() {
-        lastPlayedStateItem = lastPlatedStateDao.getLastPlayed();
+        lastPlayedStateItem = songRepository.getLastPlayedState();
     }
 
     public LastPlayedStateItem getLastPlayedState() {

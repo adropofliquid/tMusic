@@ -49,9 +49,8 @@ public class PlayerHandler extends Handler {
     public PlayerHandler(Looper looper, Context context, MediaSessionCompat mediaSession) {
         super(looper);
         this.context = context;
-        this.queue = new Queue(context);
         this.songRepository = new SongRepository(context);
-        this.queue.setSongRepository(songRepository);
+        this.queue = new Queue(songRepository);
         this.mediaSession = mediaSession;
 
         setNewState(PlaybackStateCompat.STATE_NONE,0);
@@ -134,7 +133,7 @@ public class PlayerHandler extends Handler {
         //FIXME speeds anytin??
         // stopPlaybackStateUpdate();
         setNewState(PlaybackStateCompat.STATE_PLAYING, 0);
-        SongItem song = songRepository.getSong(context, bundle.getInt("song"));
+        SongItem song = songRepository.getSong(bundle.getInt("song"));
         queue.setCurrentSong(song);
         mediaSession.getController().getTransportControls().play();
     }
@@ -192,7 +191,7 @@ public class PlayerHandler extends Handler {
                 repeatAll();
         }
         else{
-            if(queue.hasNext(isSessionShuffling())) {
+            if(queue.hasNext()) {
                 moveDownQueue();
                 onPlay();
             }
@@ -223,7 +222,7 @@ public class PlayerHandler extends Handler {
                 onSkipToQueueItem(queue.getCurrentSong().getPlayOrder() - 1);
         }
         else {
-            if(queue.hasPrev(isSessionShuffling())){
+            if(queue.hasPrev()){
                 moveUpQueue();
                 onPlay();
             }
@@ -247,11 +246,11 @@ public class PlayerHandler extends Handler {
 
         if(isSessionShuffling()){
 //            queue.setCurrentSongWithPlayOrder(id);
-            queue.setCurrentSong(songRepository.getSong(context,id));
+            queue.setCurrentSong(songRepository.getSongByPlayOrder(id));
         }
         else{
             //FIXME abi na TODO error of music not found
-            queue.setCurrentSongWithId(id);
+            queue.setCurrentSong(songRepository.getSong(id));
         }
         mediaSession.getController().getTransportControls().play();
     }
@@ -285,19 +284,6 @@ public class PlayerHandler extends Handler {
         //mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build());
         //mediaPlayer.setPlaybackParams(new PlaybackParams().setSpeed(4.0f)); //
         mediaPlayer.setOnCompletionListener(mediaPlayer -> mediaSession.getController().getTransportControls().skipToNext());
-
-        // FIXME experimental
-        //  on error fix
-        //  media was not found maybe
-        //  so go to next
-
-        mediaPlayer.setOnErrorListener((mp, what, extra) -> {
-
-            onStop();
-            mp.release();
-            onSkipToNext();
-            return false;
-        });
     }
 
     private void stopReleaseMediaPlayer(int state) {
@@ -345,8 +331,10 @@ public class PlayerHandler extends Handler {
         }
         builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.getTitle());
         builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION,currentSong.getDuration());
-        builder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, currentSong.getId());
-
+        if(isSessionShuffling())
+            builder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, currentSong.getPlayOrder());
+        else
+            builder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, currentSong.getId());
         return builder.build();
     }
 
@@ -382,7 +370,7 @@ public class PlayerHandler extends Handler {
     }
 
     private void moveDownQueue() { //could change to making queue Class do it
-        if(queue.hasNext(isSessionShuffling())){
+        if(queue.hasNext()){
             if(isSessionShuffling())
                 queue.setCurrentSongWithId(queue.getCurrentSong().getPlayOrder() + 1);
             else
@@ -400,7 +388,7 @@ public class PlayerHandler extends Handler {
     }
 
     private void moveUpQueue() {
-        if(queue.hasPrev(isSessionShuffling())){
+        if(queue.hasPrev()){
             if(isSessionShuffling())
                 queue.setCurrentSongWithId(queue.getCurrentSong().getPlayOrder() - 1);
             else

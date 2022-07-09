@@ -20,11 +20,11 @@ import com.adropofliquid.tmusic.uncat.items.SongItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 
 
 public class SongsFragment extends Fragment {
-
 
     private RecyclerView recyclerView;
     private Executor executor;
@@ -50,13 +50,13 @@ public class SongsFragment extends Fragment {
 
     private void populateRecycler(){
 
-        SongRepository songRepository = new SongRepository(executor);
-        songRepository.loadSongs(getContext(), this::spawnAdapter);
+        SongRepository songRepository = new SongRepository(requireActivity());
+        songRepository.loadSongs(this::spawnAdapter);
     }
 
     private void spawnAdapter(List<SongItem> songs) {
         AdapterSpawn adapterSpawn = new AdapterSpawn(executor);
-        adapterSpawn.spawn(getActivity(), (ArrayList<SongItem>) songs, this::putAdapterOnMainThread);
+        adapterSpawn.spawn(getActivity(),songs, this::putAdapterOnMainThread);
     }
 
     private void putAdapterOnMainThread(RecyclerView.Adapter adapter){

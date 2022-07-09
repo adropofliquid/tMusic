@@ -70,4 +70,6 @@ public interface SongDao {
     @Query("UPDATE songitem SET playOrder = :playOrder WHERE id = :id")
     void loadForShuffle(int id, int playOrder);
 
+    @Query("SELECT * FROM songitem ORDER BY playOrder ASC")
+    List<SongItem> getAllByPlayOrder();
 }

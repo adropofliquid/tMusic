@@ -9,9 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adropofliquid.tmusic.data.SongRepository;
-import com.adropofliquid.tmusic.uncat.items.SongItem;
-
-import java.util.List;
 
 public class SongListShuffleViewHolder extends RecyclerView.ViewHolder{
 
@@ -24,18 +21,17 @@ public class SongListShuffleViewHolder extends RecyclerView.ViewHolder{
     }
     private void shuffleAllSongs(Activity activity) {
 
+        MediaControllerCompat.getMediaController(activity).getTransportControls()
+                .setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_ALL);
 
         SongRepository songRepository = new SongRepository(activity);
-        songRepository.loadShuffledSongs(activity, song -> {
+        songRepository.shuffleSongs(song -> {
             Bundle bundle = new Bundle();
             bundle.putInt("song", song.getPlayOrder());
 
             MediaControllerCompat.getMediaController(activity).getTransportControls()
-                    .playFromMediaId("song", bundle);
+                    .skipToQueueItem(song.getPlayOrder());
         });
-
-        MediaControllerCompat.getMediaController(activity).getTransportControls()
-                .setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_ALL);
     }
 
 

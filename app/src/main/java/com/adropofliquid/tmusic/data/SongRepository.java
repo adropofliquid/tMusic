@@ -10,10 +10,11 @@ import android.util.Log;
 import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.room.SongRoom;
 import com.adropofliquid.tmusic.room.dao.CacheVersionDao;
+import com.adropofliquid.tmusic.room.dao.LastPlatedStateDao;
 import com.adropofliquid.tmusic.room.dao.SongDao;
 import com.adropofliquid.tmusic.room.model.CacheVersionItem;
+import com.adropofliquid.tmusic.room.model.LastPlayedStateItem;
 import com.adropofliquid.tmusic.uncat.items.SongItem;
-import com.adropofliquid.tmusic.data.mediastore.LoadMediaStore;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,12 +25,8 @@ public class SongRepository {
 
     private static final String TAG = "Song Repository: ";
     private final Executor executor;
-    private Context context;
-    private SongRoom songRoom;
-
-    public SongRepository(Executor executor){
-        this.executor = executor;
-    }
+    private final Context context;
+    private final SongRoom songRoom;
 
     public SongRepository(Context context){
         this.executor =  ((App)context.getApplicationContext()).getExecutor();
@@ -37,7 +34,7 @@ public class SongRepository {
         this.songRoom = ((App)context.getApplicationContext()).getSongRoom();
     }
 
-    public void loadSongs(Context context, OnSongsLoadedCallback onSongsLoadedCallback) {
+    public void loadSongs(OnSongsLoadedCallback onSongsLoadedCallback) {
         executor.execute(()->{
             List<SongItem> songs;
 
@@ -49,7 +46,26 @@ public class SongRepository {
         });
     }
 
-    public void loadShuffledSongs(Context context, OnSongsShuffledCallback onSongsShuffledCallback) {
+    public void loadCacheSongsPlayOrder(OnSongsLoadedCallback onSongsLoadedCallback) {
+        executor.execute(()->{
+            List<SongItem> songs = getCachedSongsPlayOrder(context);
+            Log.d(TAG, "Songs loaded from cache: " + songs.size());
+            onSongsLoadedCallback.onLoaded(songs);
+
+            for (int i = 0;i < songs.size(); ++i) {
+                Log.d("Song", songs.get(i).getId()+" "+songs.get(i).getPlayOrder());
+            }
+        });
+
+    }
+
+    private List<SongItem> getCachedSongsPlayOrder(Context context) {
+        SongRoom songRoom = ((App)context.getApplicationContext()).getSongRoom();
+        SongDao songDao = songRoom.songDao();
+        return songDao.getAllByPlayOrder();
+    }
+
+    public void shuffleSongs(OnSongsShuffledCallback onSongsShuffledCallback) {
         executor.execute(()->{
             List<SongItem> songs = getCachedSongs(context);
             List<Integer> shuffledPlayOrder = shuffledPlayOrder(songs.size());
@@ -58,9 +74,13 @@ public class SongRepository {
                 songs.get(i).setPlayOrder(shuffledPlayOrder.get(i));
             }
 
-            onSongsShuffledCallback.onShuffled(songs.get(1));
             cacheSongs(context,songs, getCacheVersion(context));
+            onSongsShuffledCallback.onShuffled(getSongByPlayOrder(0));
         });
+    }
+
+    public SongItem getSongByPlayOrder(int playOrder) {
+        return songRoom.songDao().findByPlayOrder(playOrder);
     }
 
     private List<Integer> shuffledPlayOrder(int size){
@@ -79,7 +99,7 @@ public class SongRepository {
                 cacheSongs(context,mediaStoreSongs, MediaStore.getVersion(context));
             else
                 clearCache(context);
-            loadSongs(context, onSongsLoadedCallback); // to update whoever initiated dis
+            loadSongs(onSongsLoadedCallback); // to update whoever initiated dis
         });
     }
 
@@ -94,7 +114,6 @@ public class SongRepository {
         });
 
         updateCacheVersion(String.valueOf(0), context);
-
     }
 
     private void cacheSongs(Context context, List<SongItem> songs, String cacheVersion) {
@@ -108,9 +127,7 @@ public class SongRepository {
             Log.d(TAG, "Songs cached: " + songs.size());
 
         });
-
         updateCacheVersion(cacheVersion, context);
-
     }
 
     private void updateCacheVersion(String version, Context context) {
@@ -199,8 +216,7 @@ public class SongRepository {
         return songList;
     }
 
-    public SongItem getSong(Context context,int position){
-        SongRoom songRoom = ((App)context.getApplicationContext()).getSongRoom();
+    public SongItem getSong(int position){
         SongDao songDao = songRoom.songDao();
         return songDao.findById(position);
     }
@@ -222,4 +238,24 @@ public class SongRepository {
         void onShuffled(SongItem song);
     }
 
+    public interface OnLastSongLoadCallback{
+        void onLoad(LastPlayedStateItem last, SongItem song);
+    }
+
+    public LastPlayedStateItem getLastPlayedState() {
+        LastPlatedStateDao lastPlatedStateDao = songRoom.lastPlatedStateDao();
+        return lastPlatedStateDao.getLastPlayed();
+    }
+
+    public void loadLastState(OnLastSongLoadCallback onLastSongLoadCallback) {
+        executor.execute(()->{
+            onLastSongLoadCallback.onLoad(getLastPlayedState(), getSong(getLastPlayedState().getId()));
+        });
+    }
+
+    public void saveLastPlayedState(LastPlayedStateItem lastPlayedStateItem){
+        LastPlatedStateDao lastPlatedStateDao = songRoom.lastPlatedStateDao();
+        lastPlatedStateDao.delete();
+        lastPlatedStateDao.insertAll(lastPlayedStateItem);
+    }
 }
