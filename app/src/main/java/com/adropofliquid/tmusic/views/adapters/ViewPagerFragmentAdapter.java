@@ -21,16 +21,17 @@ public class ViewPagerFragmentAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
 
-        switch (position) {
-            case 0:
-                return new AlbumsListFragment();
-            default:
-                return new SongsFragment();
-        }
+        return new SongsFragment();
+//        switch (position) {
+//            case 0:
+//                return new AlbumsListFragment();
+//            default:
+//                return new SongsFragment();
+//        }
     }
 
     @Override
     public int getItemCount() {
-        return 2;
+        return 1;
     }
 }

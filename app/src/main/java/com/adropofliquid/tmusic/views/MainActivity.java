@@ -276,8 +276,8 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (view.getId()) {
                     case R.id.bottom_player:
-                        Intent intent = new Intent(getApplicationContext(), NowPlaying.class);
-                        startActivity(intent);
+                        /*TODO start NowPlaying activity Intent intent = new Intent(getApplicationContext(), NowPlaying.class);
+                        startActivity(intent);*/
                         break;
                     case R.id.bottom_player_prev:
                         mediaController.getTransportControls().skipToPrevious();

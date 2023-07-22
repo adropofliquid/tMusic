@@ -287,7 +287,6 @@ public class PlayerHandler extends Handler {
     }
 
     private void stopReleaseMediaPlayer(int state) {
-
         if(mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.reset();

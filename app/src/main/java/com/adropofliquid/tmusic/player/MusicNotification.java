@@ -14,6 +14,7 @@ import androidx.media.session.MediaButtonReceiver;
 
 import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.R;
+import com.adropofliquid.tmusic.views.MainActivity;
 import com.adropofliquid.tmusic.views.nowplaying.NowPlaying;
 
 public class MusicNotification {
@@ -93,7 +94,7 @@ public class MusicNotification {
     }
 
     private PendingIntent createContentIntent() {
-        Intent openUI = new Intent(context, NowPlaying.class);
+        Intent openUI = new Intent(context, MainActivity.class); //TODO should be NowPlaying
         openUI.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(
                 context, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);

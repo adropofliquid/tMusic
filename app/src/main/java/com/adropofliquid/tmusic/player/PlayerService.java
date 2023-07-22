@@ -85,10 +85,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
     @Override
     public void onDestroy() {
+        noiseReciever.unregisterAudioNoisyReceiver();
         mediaSession.getController().getTransportControls().stop();
         super.onDestroy();
-        thread.quit();
-        stopSelf();
     }
 
     @Nullable
