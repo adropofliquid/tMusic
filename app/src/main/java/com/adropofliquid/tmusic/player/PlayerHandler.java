@@ -12,14 +12,11 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import com.adropofliquid.tmusic.App;
 import com.adropofliquid.tmusic.data.SongRepository;
 import com.adropofliquid.tmusic.uncat.items.SongItem;
 import com.adropofliquid.tmusic.data.queue.Queue;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.Executor;
 
 
 public class PlayerHandler extends Handler {
@@ -53,7 +50,7 @@ public class PlayerHandler extends Handler {
         this.queue = new Queue(songRepository);
         this.mediaSession = mediaSession;
 
-        setNewState(PlaybackStateCompat.STATE_NONE,0);
+        setPlaybackState(PlaybackStateCompat.STATE_NONE,0);
         prepareLastPlayed();
     }
 
@@ -132,7 +129,7 @@ public class PlayerHandler extends Handler {
     private void onPlayFromMediaId(Bundle bundle) {
         //FIXME speeds anytin??
         // stopPlaybackStateUpdate();
-        setNewState(PlaybackStateCompat.STATE_PLAYING, 0);
+        setPlaybackState(PlaybackStateCompat.STATE_PLAYING, 0);
         SongItem song = songRepository.getSong(bundle.getInt("song"));
         queue.setCurrentSong(song);
         mediaSession.getController().getTransportControls().play();
@@ -143,11 +140,11 @@ public class PlayerHandler extends Handler {
         if(mediaSession.getController().getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE ||
                 mediaSession.getController().getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED){
 
-            setNewState(PlaybackStateCompat.STATE_PLAYING,
+            setPlaybackState(PlaybackStateCompat.STATE_PLAYING,
                     queue.getLastPlayedState().getTimePlayed());
 
             if(mediaPlayer != null){
-                setNewState(PlaybackStateCompat.STATE_PLAYING,mediaPlayer.getCurrentPosition());
+                setPlaybackState(PlaybackStateCompat.STATE_PLAYING,mediaPlayer.getCurrentPosition());
                 setNewMetadata();
                 mediaPlayer.start();
                 updateAndSaveCurrentPosition();
@@ -162,7 +159,7 @@ public class PlayerHandler extends Handler {
 
     private void onPause() {
 
-        setNewState(PlaybackStateCompat.STATE_PAUSED,mediaPlayer.getCurrentPosition());
+        setPlaybackState(PlaybackStateCompat.STATE_PAUSED,mediaPlayer.getCurrentPosition());
         setNewMetadata();
         mediaPlayer.pause();
         stopPlaybackStateUpdate();
@@ -204,7 +201,7 @@ public class PlayerHandler extends Handler {
     private void repeatSong(){
          //play the current song again
             mediaPlayer.seekTo(0);
-            setNewState(PlaybackStateCompat.STATE_PAUSED, 0);
+            setPlaybackState(PlaybackStateCompat.STATE_PAUSED, 0);
             onPlay();
     }
 
@@ -242,7 +239,7 @@ public class PlayerHandler extends Handler {
     }
 
     private void onSkipToQueueItem(int id) {
-        setNewState(PlaybackStateCompat.STATE_PLAYING, 0);
+        setPlaybackState(PlaybackStateCompat.STATE_PLAYING, 0);
 
         if(isSessionShuffling()){
 //            queue.setCurrentSongWithPlayOrder(id);
@@ -257,7 +254,7 @@ public class PlayerHandler extends Handler {
 
     private void onPlayFromLast(int id) {
 
-        setNewState(PlaybackStateCompat.STATE_PLAYING,
+        setPlaybackState(PlaybackStateCompat.STATE_PLAYING,
                 queue.getLastPlayedState().getTimePlayed());
 
         queue.setCurrentSongWithId(id);
@@ -293,7 +290,7 @@ public class PlayerHandler extends Handler {
             mediaPlayer.release();
             Log.d(TAG," A player was released");
             mediaPlayer = null;
-            setNewState(state,0);
+            setPlaybackState(state,0);
         }
 
     }
@@ -304,7 +301,7 @@ public class PlayerHandler extends Handler {
         }
         postDelayed(() -> {
             int currentPosition = mediaPlayer.getCurrentPosition();
-            setNewState(PlaybackStateCompat.STATE_PLAYING,currentPosition);
+            setPlaybackState(PlaybackStateCompat.STATE_PLAYING,currentPosition);
             saveLastState();
             updateAndSaveCurrentPosition();
         }, 1000);
@@ -324,8 +321,6 @@ public class PlayerHandler extends Handler {
         try {
             builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, MediaStore.Images.Media.getBitmap(context.getContentResolver(),currentSong.getAlbumArtUri()));
         } catch (IOException e) {
-
-            //TODO replace wit placeholder
             e.printStackTrace();
         }
         builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.getTitle());
@@ -337,7 +332,7 @@ public class PlayerHandler extends Handler {
         return builder.build();
     }
 
-    private void setNewState(@PlaybackStateCompat.State int newState, long playPosition) {
+    private void setPlaybackState(@PlaybackStateCompat.State int newState, long playPosition) {
 
         PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder().setActions(
                 PlaybackStateCompat.ACTION_PLAY |
@@ -381,8 +376,7 @@ public class PlayerHandler extends Handler {
         }
         stopReleaseMediaPlayer(PlaybackStateCompat.STATE_PAUSED);
         setNewMetadata();
-        //FIXME maybe useless
-        setNewState(PlaybackStateCompat.STATE_PAUSED, 0);
+        setPlaybackState(PlaybackStateCompat.STATE_PAUSED, 0);
         stopPlaybackStateUpdate();
     }
 
@@ -399,7 +393,7 @@ public class PlayerHandler extends Handler {
         }
         stopReleaseMediaPlayer(PlaybackStateCompat.STATE_PAUSED);
         setNewMetadata();
-        setNewState(PlaybackStateCompat.STATE_PAUSED, 0);
+        setPlaybackState(PlaybackStateCompat.STATE_PAUSED, 0);
         stopPlaybackStateUpdate();
     }
 
@@ -407,7 +401,7 @@ public class PlayerHandler extends Handler {
 //        mediaSession.setShuffleMode(what);
         Log.d("TAG ","Song shuffle: set to "+ what);
 //        if(what == PlaybackStateCompat.SHUFFLE_MODE_GROUP)
-            //TODO shufffle was from nowPlaying view so tell repo to shuffle
+            //TODO shufffle from nowPlaying view
     }
 
 }

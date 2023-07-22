@@ -10,8 +10,6 @@ import android.os.Looper;
 import androidx.core.os.HandlerCompat;
 import androidx.room.Room;
 
-import com.adropofliquid.tmusic.data.SongRepository;
-import com.adropofliquid.tmusic.room.QueueDb;
 import com.adropofliquid.tmusic.room.SongRoom;
 
 import java.util.concurrent.Executor;
@@ -21,7 +19,7 @@ import java.util.concurrent.Executors;
 public class App extends Application {
 
     public static final String CHANNEL_ID = "Music";
-    QueueDb queueDb;
+
     SongRoom songRoom;
     ExecutorService executorService;
     Handler mainThreadHandler;
@@ -31,7 +29,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         createChannel();
-        queueDb = Room.databaseBuilder(this, QueueDb.class, "queue").allowMainThreadQueries().fallbackToDestructiveMigration().build();//FIXME maybe disallow mainthread queries
         songRoom = Room.databaseBuilder(this, SongRoom.class, "songs").fallbackToDestructiveMigration().build();
         executorService = Executors.newFixedThreadPool(4);
         mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());
@@ -55,10 +52,6 @@ public class App extends Application {
 
     }
 
-    public QueueDb getQueueDb() {
-        return queueDb;
-    }
-
     public Executor getExecutor(){
         return executorService;
     }
@@ -74,7 +67,6 @@ public class App extends Application {
     @Override
     public void onTerminate() {
         super.onTerminate();
-        queueDb.close();
         songRoom.close();
     }
 }
