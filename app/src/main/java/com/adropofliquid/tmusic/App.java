@@ -28,13 +28,13 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        createChannel();
+        createNotificationChannel();
         songRoom = Room.databaseBuilder(this, SongRoom.class, "songs").fallbackToDestructiveMigration().build();
         executorService = Executors.newFixedThreadPool(4);
         mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());
     }
 
-    private void createChannel() {
+    private void createNotificationChannel() {
 
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
@@ -66,7 +66,8 @@ public class App extends Application {
 
     @Override
     public void onTerminate() {
-        super.onTerminate();
         songRoom.close();
+        executorService.shutdown();
+        super.onTerminate();
     }
 }

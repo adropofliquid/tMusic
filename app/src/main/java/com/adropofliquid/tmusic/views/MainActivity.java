@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -64,6 +65,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         loadMusicPlayer(savedInstanceState);
+
+//        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy())
+//                .detectLeakedClosableObjects()
+//                .build());
     }
 
     private void loadMusicPlayer(Bundle savedInstanceState) {
@@ -302,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         if(mediaBrowser != null)
-        mediaBrowser.connect();
+            mediaBrowser.connect();
     }
 
     @Override

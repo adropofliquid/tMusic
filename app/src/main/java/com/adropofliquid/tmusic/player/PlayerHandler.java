@@ -127,8 +127,6 @@ public class PlayerHandler extends Handler {
     }
 
     private void onPlayFromMediaId(Bundle bundle) {
-        //FIXME speeds anytin??
-        // stopPlaybackStateUpdate();
         setPlaybackState(PlaybackStateCompat.STATE_PLAYING, 0);
         SongItem song = songRepository.getSong(bundle.getInt("song"));
         queue.setCurrentSong(song);

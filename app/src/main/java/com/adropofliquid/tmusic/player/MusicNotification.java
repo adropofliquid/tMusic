@@ -94,7 +94,7 @@ public class MusicNotification {
     }
 
     private PendingIntent createContentIntent() {
-        Intent openUI = new Intent(context, MainActivity.class); //TODO should be NowPlaying
+        Intent openUI = new Intent(context, MainActivity.class); //TODO should be NowPlaying view
         openUI.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(
                 context, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);

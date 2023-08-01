@@ -81,6 +81,8 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 notification.show();
             }
         });
+
+
     }
 
     @Override
@@ -212,9 +214,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
             tellPlayerTo(PlayerHandler.STOP);
             abandonFocus();
             noiseReciever.unregisterAudioNoisyReceiver();
-            stopSelf();
-            mediaSession.setActive(false);
             stopForeground(false);
+            mediaSession.setActive(false);
+            stopSelf();
         }
 
         @Override
@@ -299,7 +301,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
                             //onPlay();
                         } else if (mediaSession.getController().getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING) {
                             setVolume(MEDIA_VOLUME_DEFAULT);
-
                         }
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
